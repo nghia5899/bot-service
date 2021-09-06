@@ -1,0 +1,255 @@
+{
+	"info": {
+		"_postman_id": "d940a118-8060-4942-a11c-6ae808436b0e",
+		"name": "crypto",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "addCoupleCurrency",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"listCoupleCurrency\": [\n        {\n            \"currencyFrom\": \"BTC\",\n            \"currencyTo\": \"USDT\"\n        },\n        {\n            \"currencyFrom\": \"ETH\",\n            \"currencyTo\": \"USDT\"\n        },\n        {\n            \"currencyFrom\": \"DOGE\",\n            \"currencyTo\": \"USDT\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/currency/addCoupleCurrency",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"currency",
+						"addCoupleCurrency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteCouleCurrency",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"listCoupleCurrency\": [\n        {\n            \"currencyFrom\": \"ETH\",\n            \"currencyTo\": \"USDT\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{env}}/currency/deleteCoupleCurrency",
+					"host": [
+						"{{env}}"
+					],
+					"path": [
+						"currency",
+						"deleteCoupleCurrency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "listHistoryMinute",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{env}}/history/listHistoryMinute?currencyFrom=BTC&currencyTo=USDT&limit=5",
+					"host": [
+						"{{env}}"
+					],
+					"path": [
+						"history",
+						"listHistoryMinute"
+					],
+					"query": [
+						{
+							"key": "currencyFrom",
+							"value": "BTC"
+						},
+						{
+							"key": "currencyTo",
+							"value": "USDT"
+						},
+						{
+							"key": "limit",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "listHistoryHour",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{env}}/history/listHistoryHour?currencyFrom=XRP&currencyTo=USDT&limit=5",
+					"host": [
+						"{{env}}"
+					],
+					"path": [
+						"history",
+						"listHistoryHour"
+					],
+					"query": [
+						{
+							"key": "currencyFrom",
+							"value": "XRP"
+						},
+						{
+							"key": "currencyTo",
+							"value": "USDT"
+						},
+						{
+							"key": "limit",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "starJob",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{env}}/job/startJob",
+					"host": [
+						"{{env}}"
+					],
+					"path": [
+						"job",
+						"startJob"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "stopJob",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{env}}/job/stopJob",
+					"host": [
+						"{{env}}"
+					],
+					"path": [
+						"job",
+						"stopJob"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "listAllCoin",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{env}}/coin/listAllCoin?size=5&page=2",
+					"host": [
+						"{{env}}"
+					],
+					"path": [
+						"coin",
+						"listAllCoin"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "5"
+						},
+						{
+							"key": "page",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "initCoin",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{env}}/initData/listcoin",
+					"host": [
+						"{{env}}"
+					],
+					"path": [
+						"initData",
+						"listcoin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "refreshAllHistory",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{env}}/history/refreshAllHistory",
+					"host": [
+						"{{env}}"
+					],
+					"path": [
+						"history",
+						"refreshAllHistory"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "env",
+			"value": "http://localhost:3000"
+		}
+	]
+}
