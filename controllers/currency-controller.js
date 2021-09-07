@@ -1,5 +1,5 @@
 const apiResponse = require('../helpers/apiResponse')
-const currencyService = require('../services/currency_service')
+const currencyService = require('../services/currency-service')
 
 class CurrencyController {
 
@@ -24,6 +24,5 @@ class CurrencyController {
     }
   }
 }
-
 
 module.exports = new CurrencyController

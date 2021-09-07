@@ -1,5 +1,4 @@
 let mongoose = require("mongoose");
-const AutoIncrement = require('mongoose-sequence')(mongoose)
 
 let coupleCurrencyModel = {}
 
