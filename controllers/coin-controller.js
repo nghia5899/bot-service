@@ -1,5 +1,5 @@
 const apiResponse = require('../helpers/apiResponse')
-const coinService = require('../services/coin_service')
+const coinService = require('../services/coin-service')
 
 class CoinController {
 

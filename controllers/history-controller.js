@@ -1,16 +1,15 @@
-const { History } = require('../models/history_model')
-const convertUtil = require('../utils/convert')
 const apiResponse = require('../helpers/apiResponse')
-const historyService = require('../services/history_service')
-const cloneHistoryService = require('../services/clone_history_service')
+const historyService = require('../services/history-service')
+const cloneHistoryService = require('../services/clone-history-service')
 
 class HistoryController {
+  
   async listHistoryMinute(req, res) {
-    let currency_from = req.query.currencyFrom
-    let currency_to = req.query.currencyTo
+    let currencyFrom = req.query.currencyFrom
+    let currencyTo = req.query.currencyTo
     let limit = req.query.limit
     try {
-      let response = await historyService.getListHistoryMinute(currency_from, currency_to, limit)
+      let response = await historyService.getListHistoryMinute(currencyFrom, currencyTo, limit)
       return apiResponse.successResponseWithData(res, "", response)
     } catch (err) {
       console.log(err)
@@ -19,11 +18,11 @@ class HistoryController {
   }
 
   async listHistoryHour(req, res) {
-    var currency_from = req.query.currencyFrom
-    var currency_to = req.query.currencyTo
+    var currencyFrom = req.query.currencyFrom
+    var currencyTo = req.query.currencyTo
     let limit = req.query.limit
     try {
-      let response = await historyService.getListHistoryHour(currency_from, currency_to, limit)
+      let response = await historyService.getListHistoryHour(currencyFrom, currencyTo, limit)
       return apiResponse.successResponseWithData(res, "", response)
     } catch (err) {
       console.log(err)

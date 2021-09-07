@@ -10,7 +10,7 @@ exports.successResponseWithData = function (res, msg, data) {
 	var resData = {
 		status: "Success",
 		message: msg,
-		data: data
+		data: data || []
 	};
 	return res.status(200).json(resData);
 };
@@ -19,8 +19,8 @@ exports.successResponseWithPagination = function (res, msg, data, pagination) {
 	var resData = {
 		status: "Success",
 		message: msg,
-		data: data,
-		pagination: pagination
+		data: data || [],
+		pagination: pagination || []
 	};
 	return res.status(200).json(resData);
 };
@@ -45,7 +45,7 @@ exports.validationErrorWithData = function (res, msg, data) {
 	var resData = {
 		status: "Error",
 		message: msg,
-		data: data
+		data: data || []
 	};
 	return res.status(400).json(resData);
 };

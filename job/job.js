@@ -1,5 +1,5 @@
 const cronJob = require('cron')
-const cloneHistoryService = require('../services/clone_history_service')
+const cloneHistoryService = require('../services/clone-history-service')
 const apiResponse = require('../helpers/apiResponse')
 
 var jobController = {}
