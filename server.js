@@ -3,7 +3,6 @@ require('dotenv').config()
 const bodyParser = require('body-parser')
 const route = require('./routes/index-routes')
 const path = require('path')
-const job = require('./job/job.js')
 
 const app = express();
 

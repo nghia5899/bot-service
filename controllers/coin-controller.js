@@ -1,4 +1,5 @@
-const apiResponse = require('../helpers/apiResponse')
+const {ResponseData} = require('../helpers/response-data')
+const { ResponseDataWithPagination } = require('../helpers/response-data')
 const coinService = require('../services/coin-service')
 
 class CoinController {
@@ -8,33 +9,29 @@ class CoinController {
     let page = req.query.page || 1
     try {
       let response = coinService.getAllCurrency(size, page)
-      apiResponse.successResponseWithPagination(res, "", response.data, response.pagination)
+      return res.json(new ResponseDataWithPagination(true, "", response.data, response.pagination).toJson())
     } catch (err) {
       console.log(err)
-      apiResponse.ErrorResponse(res, "Error")
+      return res.json(new ResponseData(false, err).toJson())
     }
   }
 
   initCoin(req, res) {
     try {
       coinService.initCoin()
-      apiResponse.successResponse(res, "init Coin success")
+      return res.json(new ResponseDataWithPagination(true, "").toJson())
     } catch (err) {
       console.log(err)
-      apiResponse.ErrorResponse(res, "Error")
+      return res.json(new ResponseData(false, err).toJson())
     }
   }
 
   addCoin(req, res) {
-    res.json({
-      status: 'post'
-    })
+    return res.json(new ResponseData(true, "",).toJson())
   }
 
   deleteCoin(req, res) {
-    res.json({
-      status: 'delete'
-    })
+    return res.json(new ResponseData(true, "",).toJson())
   }
 
 }

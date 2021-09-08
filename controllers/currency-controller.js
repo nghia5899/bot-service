@@ -1,4 +1,4 @@
-const apiResponse = require('../helpers/apiResponse')
+const {ResponseData} = require('../helpers/response-data')
 const currencyService = require('../services/currency-service')
 
 class CurrencyController {
@@ -7,10 +7,10 @@ class CurrencyController {
     try {
       var listCoupleCurrency = req.body.listCoupleCurrency
       currencyService.insertCoupleCurrency(listCoupleCurrency)
-      return apiResponse.successResponse(res, "Add list couple currency success")
+      return res.json(new ResponseData(true, "Add list couple currency success").toJson())
     } catch (e) {
       console.log(e)
-      return apiResponse.ErrorResponse(res, e.toString())
+      return res.json(new ResponseData(false, e).toJson())
     }
   }
 
@@ -18,9 +18,9 @@ class CurrencyController {
     let listCoupleCurrency = req.body.listCoupleCurrency
     try {
       currencyService.deleteCoupleCurrency(listCoupleCurrency)
-      return apiResponse.successResponse(res, "Delete success")
+      return res.json(new ResponseData(true, "Delete success").toJson())
     } catch (e) {
-      return apiResponse.ErrorResponse(res, "Delete list couple currency success")
+      return res.json(new ResponseData(false, e).toJson())
     }
   }
 }
