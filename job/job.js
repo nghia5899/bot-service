@@ -1,6 +1,6 @@
 const cronJob = require('cron')
 const cloneHistoryService = require('../services/clone-history-service')
-const apiResponse = require('../helpers/apiResponse')
+const {ResponseData} = require('../helpers/response-data')
 
 var jobController = {}
 
@@ -38,10 +38,10 @@ jobController.startJob = (req, res) => {
   try {
     jobAddHistoryMinute.start()
     jobAddHistoryHour.start()
-    apiResponse.successResponse(res, "Start job addAllCurrencyHistory success")
+    return res.json(new ResponseData(true, "Start job addAllCurrencyHistory success").toJson())
   } catch (e) {
     console.log(e)
-    apiResponse.errorResponse(res, "Start job addAllCurrencyHistory fail'")
+    return res.json(new ResponseData(false, e).toJson())
   }
 }
 
@@ -52,10 +52,10 @@ jobController.stopJob = (req, res) => {
   try {
     jobAddHistoryMinute.stop()
     jobAddHistoryHour.stop()
-    apiResponse.successResponse(res, "Stop job addAllCurrencyHistoryMinute success")
+    return res.json(new ResponseData(true, "Stop job addAllCurrencyHistory success").toJson())
   } catch (e) {
     console.log(e)
-    apiResponse.errorResponse(res, "Stop job addAllCurrencyHistory fail'")
+    return res.json(new ResponseData(false, e).toJson())
   }
 }
 

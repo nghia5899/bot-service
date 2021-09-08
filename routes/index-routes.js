@@ -2,7 +2,7 @@ const historyRoutes = require('./history-route')
 const currencyRoutes = require('./currency-route')
 const coinRoutes = require('./coin-route')
 const jobRoutes = require('./job-routes')
-const apiResponse = require('../helpers/apiResponse')
+const {ResponseData} = require('../helpers/response-data')
 
 function route(app) {
 
@@ -15,7 +15,7 @@ function route(app) {
   app.use('/job', jobRoutes)
 
   app.use('/', (req, res) => {
-    return apiResponse.notFoundResponse(res, "Not found")
+    return res.status(404).json(new ResponseData(false, "Not found").toJson())
   })
 }
 

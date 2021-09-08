@@ -1,6 +1,6 @@
-const apiResponse = require('../helpers/apiResponse')
 const historyService = require('../services/history-service')
 const cloneHistoryService = require('../services/clone-history-service')
+const {ResponseData} = require('../helpers/response-data')
 
 class HistoryController {
   
@@ -10,10 +10,10 @@ class HistoryController {
     let limit = req.query.limit
     try {
       let response = await historyService.getListHistoryMinute(currencyFrom, currencyTo, limit)
-      return apiResponse.successResponseWithData(res, "", response)
+      return res.json(new ResponseData(true, "", response).toJson())
     } catch (err) {
       console.log(err)
-      return apiResponse.ErrorResponse(res, err.toString())
+      return res.json(new ResponseData(false, e).toJson())
     }
   }
 
@@ -23,20 +23,20 @@ class HistoryController {
     let limit = req.query.limit
     try {
       let response = await historyService.getListHistoryHour(currencyFrom, currencyTo, limit)
-      return apiResponse.successResponseWithData(res, "", response)
+      return res.json(new ResponseData(true, "", response).toJson())
     } catch (err) {
       console.log(err)
-      return apiResponse.ErrorResponse(res, err.toString())
+      return res.json(new ResponseData(false, e).toJson())
     }
   }
 
   async refreshAllHistory(req, res) {
     try {
-      let response = await cloneHistoryService.refreshAllHistory()
-      return apiResponse.successResponseWithData(res, "Refresh success", response)
+      cloneHistoryService.refreshAllHistory()
+      return res.json(new ResponseData(true, "Refresh success").toJson())
     } catch (err) {
       console.log(err)
-      return apiResponse.ErrorResponse(res, err.toString())
+      return res.json(new ResponseData(false, e).toJson())
     }
   }
 }
