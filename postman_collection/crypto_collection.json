@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"listCoupleCurrency\": [\n        {\n            \"currencyFrom\": \"BTC\",\n            \"currencyTo\": \"USDT\"\n        },\n        {\n            \"currencyFrom\": \"ETH\",\n            \"currencyTo\": \"USDT\"\n        },\n        {\n            \"currencyFrom\": \"DOGE\",\n            \"currencyTo\": \"USDT\"\n        }\n    ]\n}",
+					"raw": "{\n    \"listCoupleCurrency\": [\n        {\n            \"currencyFrom\": \"XRP\",\n            \"currencyTo\": \"USDT\"\n        }\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -20,15 +20,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/currency/addCoupleCurrency",
-					"protocol": "http",
+					"raw": "{{env}}/currency",
 					"host": [
-						"localhost"
+						"{{env}}"
 					],
-					"port": "3000",
 					"path": [
-						"currency",
-						"addCoupleCurrency"
+						"currency"
 					]
 				}
 			},
@@ -67,18 +64,18 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{env}}/history/listHistoryMinute?currencyFrom=BTC&currencyTo=USDT&limit=5",
+					"raw": "{{env}}/history/minute?currencyFrom=AXS&currencyTo=USDT&limit=5",
 					"host": [
 						"{{env}}"
 					],
 					"path": [
 						"history",
-						"listHistoryMinute"
+						"minute"
 					],
 					"query": [
 						{
 							"key": "currencyFrom",
-							"value": "BTC"
+							"value": "AXS"
 						},
 						{
 							"key": "currencyTo",
@@ -131,13 +128,12 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "{{env}}/job/startJob",
+					"raw": "{{env}}/job",
 					"host": [
 						"{{env}}"
 					],
 					"path": [
-						"job",
-						"startJob"
+						"job"
 					]
 				}
 			},
@@ -146,16 +142,15 @@
 		{
 			"name": "stopJob",
 			"request": {
-				"method": "POST",
+				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{env}}/job/stopJob",
+					"raw": "{{env}}/job",
 					"host": [
 						"{{env}}"
 					],
 					"path": [
-						"job",
-						"stopJob"
+						"job"
 					]
 				}
 			},
@@ -167,13 +162,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{env}}/coin/listAllCoin?size=5&page=2",
+					"raw": "{{env}}/coin?size=5&page=2",
 					"host": [
 						"{{env}}"
 					],
 					"path": [
-						"coin",
-						"listAllCoin"
+						"coin"
 					],
 					"query": [
 						{
@@ -210,16 +204,68 @@
 		{
 			"name": "refreshAllHistory",
 			"request": {
-				"method": "GET",
+				"method": "PUT",
 				"header": [],
 				"url": {
-					"raw": "{{env}}/history/refreshAllHistory",
+					"raw": "{{env}}/history/refresh",
 					"host": [
 						"{{env}}"
 					],
 					"path": [
 						"history",
-						"refreshAllHistory"
+						"refresh"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add coin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"listCoin\": [\"CAKE\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{env}}/coin",
+					"host": [
+						"{{env}}"
+					],
+					"path": [
+						"coin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteCoin",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"listCoin\": [\"XRP\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{env}}/coin",
+					"host": [
+						"{{env}}"
+					],
+					"path": [
+						"coin"
 					]
 				}
 			},
@@ -249,7 +295,7 @@
 	"variable": [
 		{
 			"key": "env",
-			"value": "http://localhost:3000"
+			"value": "http://localhost:3001"
 		}
 	]
 }
