@@ -27,11 +27,25 @@ class CoinController {
   }
 
   addCoin(req, res) {
-    return res.json(new ResponseData(true, "",).toJson())
+    try {
+      let listCoin = req.body.listCoin
+      coinService.addCoin(listCoin)
+      return res.json(new ResponseData(true, "",).toJson())
+    } catch (e) {
+      console.log(e)
+      return res.json(new ResponseData(false, e).toJson())
+    }
   }
 
   deleteCoin(req, res) {
-    return res.json(new ResponseData(true, "",).toJson())
+    try {
+      let listCoin = req.body.listCoin
+      coinService.deleteCoin(listCoin)
+      return res.json(new ResponseData(true, "",).toJson())
+    } catch (e) {
+      console.log(e)
+      return res.json(new ResponseData(false, e).toJson())
+    }
   }
 
 }

@@ -1,4 +1,5 @@
 const { Coin } = require('../models/coin')
+const cloneDataModel = require('./clone-data-service')
 
 let coinService = {
 
@@ -29,48 +30,89 @@ let coinService = {
         })
       })
     })
-    },
-  
-  async initCoin() {
+  },
+
+  async getBalance() {
     try {
-      for (let i = 0; i <= 2; i++) {
-        let response = await clone_data_model.listCoin(100, i, 'USD')
-        if (response[1] != null && response[1] != []) {
-          let listTime = JSON.parse(response[1]).Data
-          listTime.forEach(element => {
-            Coin.collection
-              .insertOne(new Coin(element.CoinInfo))
-              .catch((err) => {
-                let filter = {
-                  Id: element.CoinInfo.Id
-                }
-                let update = {$set: element.CoinInfo}
-                History.collection.findOneAndUpdate(filter, update).catch((err) => {
-                console.log(err)
-              })
-            })
-          })
-        }
-      }
-      apiResponse.successResponse(res, "Add list coin success")
+      return new Promise((resolve, reject) => {
+        Coin.find({}, {_id: 0, __v: 0}, (err, data) => {
+          if (err) return reject(err)
+          return resolve(data)
+        })
+      })
     } catch (e) {
       console.log(e)
       throw e
     }
   },
   
-  addCoin(req, res) {
-    res.json({
-      status: 'post'
-    })
+  async initCoin() {
+    try {
+      let listCoinData = await Coin.find({}, {_id: 0, _v: 0})
+      let listCoin = [];
+      if (listCoinData.length) {
+        listCoinData.forEach(element => {
+          listCoin.push(element.code)
+        })
+      } else {
+        listCoin = ['BTC', 'ETH', 'TRX', 'BNB', 'XRP', 'DOGE']
+      }
+      let response = await cloneDataModel.listSymbolsPrice(listCoin)
+      if (response[1]) {
+        let listSymbolsPrice = Object.entries(JSON.parse(response[1]))
+        new Map(listSymbolsPrice).forEach((value, key) => {
+          let coin = new CoinData({code: key, price: value.USD})
+          coin.save((err) => {
+            if (err) {
+              let filter = {
+                code: key
+              }
+              let update = {$set: {price: value.USD}}
+              Coin.collection.findOneAndUpdate(filter, update).catch((err) => {})
+            }
+          })
+        })
+      }
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
+  },
+  
+  addCoin(listCoin) {
+    try {
+      if (listCoin.length) {
+        listCoin.forEach(element => {
+          let coin = new CoinData({code: element, price: 0})
+          coin.save((err) => {
+            if (err) throw err
+            this.initCoin()
+          })
+        })
+      }
+    } catch (e) {
+      console.log(e)
+    }
   },
 
-  deleteCoin(req, res) {
-    res.json({
-      status: 'delete'
-    })
+  deleteCoin(listCoin) {
+    try {
+      if (listCoin.length) {
+        listCoin.forEach(element => {
+          Coin.collection.deleteOne({code: element})
+        })
+      }
+    } catch (e) {
+      console.log(e)
+    }
   }
 }
 
+function CoinData(coin) {
+  return Coin({
+    code: coin.code,
+    price: coin.price,
+  })
+}
 
 module.exports = coinService
