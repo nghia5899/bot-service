@@ -30,6 +30,20 @@ let cloneDataModel = {
       method: 'GET',
       }
     )
+  },
+
+  listSymbolsPrice(listCoin) {
+    let str = '';
+    listCoin.forEach(element => {
+      str += (element + ',')
+    })
+    str = str.substring(0, str.length - 1)
+    let URL = `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${str}&tsyms=USD`
+    return sendrequest({
+      uri: URL,
+      method: 'GET',
+      }
+    )
   }
   
 }

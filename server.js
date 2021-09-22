@@ -3,10 +3,12 @@ require('dotenv').config()
 const bodyParser = require('body-parser')
 const route = require('./routes/index-routes')
 const path = require('path')
-
+const jobService = require('./services/job-service')
+const currencyService = require('./services/currency-service')
+const coinService = require('./services/coin-service')
 const app = express();
 
-const port = process.env.PORT_CONFIG || 3001;
+const port = process.env.PORT || 3001;
 
 require('./config/init-mongodb')
 
@@ -19,6 +21,13 @@ app.use(bodyParser.json());
 app.use(express.json());
 
 route(app);
+
+currencyService.initCoupleCurrency()
+
+coinService.initCoin()
+jobService.startjobAddHistoryMinute()
+jobService.startjobAddHistoryHour()
+jobService.startJobGetSymbolsPrice()
 
 app.listen(port, function() {
     console.log('Node server running @ http://localhost:'+ port + '...');

@@ -44,6 +44,36 @@ let currencyService = {
         throw e
       }
     })
+  },
+
+  async initCoupleCurrency() {
+    try {
+      let listCoupleCurrency = await CoupleCurrency.find({}, {_id: 0, _v: 0})
+      if (!listCoupleCurrency.length) {
+        let listCoin = [
+          {
+            "currencyFrom": "BTC",
+            "currencyTo": "USDT"
+          },
+          {
+            "currencyFrom": "ETH",
+            "currencyTo": "USDT"
+          },
+          {
+            "currencyFrom": "TRX",
+            "currencyTo": "USDT"
+          },
+          {
+            "currencyFrom": "BNB",
+            "currencyTo": "USDT"
+          },
+        ]
+        this.insertCoupleCurrency(listCoin)
+      } 
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
   }
 
 }
