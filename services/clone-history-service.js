@@ -137,14 +137,18 @@ let CloneHistoryService = {
   },
   
   async refreshAllHistory() {
-    History.deleteMany().then((response) => {
-      CoupleCurrency.find().then((list) => {
-        list.forEach(element => {
-          addHistoryMinute(element.currencyfrom, element.currencyto, LIMIT_1_DAY)
-          addHistoryHour(element.currencyfrom, element.currencyto, LIMIT_1_MONTH)
+    try {
+      History.collection.deleteMany().then((response) => {
+        CoupleCurrency.find().then((list) => {
+          list.forEach(element => {
+            this.addHistoryMinute(element.currencyfrom, element.currencyto, LIMIT_1_DAY)
+            this.addHistoryHour(element.currencyfrom, element.currencyto, LIMIT_1_MONTH)
+          })
         })
       })
-    })
+    } catch (e) {
+      throw e
+    }
   },
   
   async jobAddHistoryMinute() {
