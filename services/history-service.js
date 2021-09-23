@@ -6,7 +6,7 @@ let historyService = {
   async getListHistoryMinute(currencyFrom, currencyTo, limit) {
     let currencyfrom = currencyFrom
     let currencyto = currencyTo
-    let limitRecord = limit ?? 1
+    let limitRecord = limit || 1
     let timeFrom = (Math.floor(convertUtil.convertoToMilliseconds(Date.now()) / 60) - limitRecord) * 60
     let timeTo = Math.floor(convertUtil.convertoToMilliseconds(Date.now()) / 60) * 60
     try {
@@ -45,7 +45,7 @@ let historyService = {
   async getListHistoryHour(currencyFrom, currencyTo, limit) {
     let currencyfrom = currencyFrom
     let currencyto = currencyTo
-    let limitRecord = limit ?? 1
+    let limitRecord = limit || 1
     let timeFrom = (Math.floor(convertUtil.convertoToMilliseconds(Date.now()) / 3600) - limitRecord) * 3600
     let timeTo = Math.floor(convertUtil.convertoToMilliseconds(Date.now()) / 3600) * 3600
     try {
