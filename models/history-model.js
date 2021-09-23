@@ -3,7 +3,6 @@ const AutoIncrement = require('mongoose-sequence')(mongoose)
 var historyModel = {}
 
 var HistorySchema = new mongoose.Schema({
-  _id: {type: Number},
   time: {type: Number, required: true},
   open: {type: Number, required:false, default: 0},
   close: {type: Number, required:false, default: 0},
@@ -21,7 +20,6 @@ var HistorySchema = new mongoose.Schema({
   timestamps: true
 }
 )
-HistorySchema.plugin(AutoIncrement)
 
 var History = mongoose.model("History", HistorySchema)
 
