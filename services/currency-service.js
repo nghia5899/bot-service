@@ -16,7 +16,7 @@ let currencyService = {
         try {
           let currency = new CoupleCurrency(CoupleCurrencyData(element))
           currency.save((err) => {
-            if (err) throw err
+            if (err) return
             cloneHistoryService.addHistoryMinute(element.currencyFrom, element.currencyTo, LIMIT_1_DAY)
             cloneHistoryService.addHistoryHour(element.currencyFrom, element.currencyTo, LIMIT_1_MONTH)
           })

@@ -4,12 +4,10 @@ const coinService = require('../services/coin-service')
 
 class CoinController {
 
-  listAllCurrency(req, res) {
-    let size = req.query.size || 20
-    let page = req.query.page || 1
+  async listAllCoin(req, res) {
     try {
-      let response = coinService.getAllCurrency(size, page)
-      return res.json(new ResponseDataWithPagination(true, "", response.data, response.pagination).toJson())
+      let response = await coinService.getAllCurrency()
+      return res.json(new ResponseData(true, "", response.data).toJson())
     } catch (err) {
       console.log(err)
       return res.json(new ResponseData(false, err).toJson())

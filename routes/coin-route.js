@@ -3,7 +3,7 @@ const router = express.Router()
 const {ResponseData} = require('../helpers/response-data')
 const coinController = require('../controllers/coin-controller')
 
-router.get('/', coinController.listAllCurrency)
+router.get('/', coinController.listAllCoin)
 
 router.post('/', coinController.addCoin)
 
