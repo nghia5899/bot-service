@@ -3,31 +3,13 @@ const cloneDataModel = require('./clone-data-service')
 
 let coinService = {
 
-  async getAllCurrency(reqSize, reqPage) {
-    let size = reqSize || 20
-    let page = reqPage || 1
-    let totalRecords
-    let totalPages
+  async getAllCurrency() {
     return new Promise((resolve, reject) => {
       Coin
-      .find({}, {_id: 0})
-      .skip((size * page) - size)
-      .limit(parseInt(size))
-      .sort('Id')
+      .find({}, {_id: 0, createdAt: 0, updatedAt: 0, __v: 0})
       .exec((err, data) => {
         if (err) return reject(err)
-        Coin.countDocuments((err, count) => {
-          if (err) return reject(err)
-          totalRecords = count
-          totalPages = Math.ceil(count / size)
-          let pagination = {
-            page: page,
-            size: size,
-            totalPages: totalPages,
-            totalRecords: totalRecords,
-          }
-          return resolve({data: data, pagination: pagination})
-        })
+        return resolve({data: data})
       })
     })
   },
@@ -85,12 +67,14 @@ let coinService = {
         listCoin.forEach(element => {
           let coin = new CoinData({code: element, price: 0})
           coin.save((err) => {
-            if (err) throw err
-            this.initCoin()
+            if (!err) {
+              this.initCoin()
+            }
           })
         })
       }
     } catch (e) {
+      console.log('catch-------')
       console.log(e)
     }
   },
