@@ -41,6 +41,7 @@ let coinService = {
       }
       let response = await cloneDataModel.listSymbolsPrice(listCoin)
       if (response[1]) {
+        if (response[1].Response) return
         let listSymbolsPrice = Object.entries(JSON.parse(response[1]))
         new Map(listSymbolsPrice).forEach((value, key) => {
           let coin = new CoinData({code: key, price: value.USD})
@@ -74,7 +75,6 @@ let coinService = {
         })
       }
     } catch (e) {
-      console.log('catch-------')
       console.log(e)
     }
   },
@@ -88,6 +88,22 @@ let coinService = {
       }
     } catch (e) {
       console.log(e)
+    }
+  },
+
+  getFee() {
+    try {
+      return new Promise((resolve, reject) => {
+        Coin
+        .find({}, {code: 1, isWithdrawable: 1, feeType: 1, feeFrom: 1, feeFix: 1, feePercen: 1, _id: 0})
+        .exec((err, data) => {
+          if (err) return reject(err)
+          return resolve(data)
+        })
+      })
+    } catch (e) {
+      console.log(e)
+      throw e
     }
   }
 }

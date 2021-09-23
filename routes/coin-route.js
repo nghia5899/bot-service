@@ -9,6 +9,8 @@ router.post('/', coinController.addCoin)
 
 router.delete('/', coinController.deleteCoin)
 
+router.get('/fee', coinController.feeWithdraw)
+
 router.use('/', (req, res) => {
   return res.status(404).json(new ResponseData(false, "Not found").toJson())
 })

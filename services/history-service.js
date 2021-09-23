@@ -77,6 +77,7 @@ let historyService = {
         })
       })
     } catch (err) {
+      console.log(err)
       throw err
     }
   }

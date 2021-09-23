@@ -26,7 +26,7 @@ class HistoryController {
       return res.json(new ResponseData(true, "", response).toJson())
     } catch (err) {
       console.log(err)
-      return res.json(new ResponseData(false, e).toJson())
+      return res.json(new ResponseData(false, err).toJson())
     }
   }
 
