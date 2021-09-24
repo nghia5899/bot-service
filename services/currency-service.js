@@ -11,7 +11,7 @@ let currencyService = {
 
   async insertCoupleCurrency(list) {
     try {
-      var listCoupleCurrency = list
+      let listCoupleCurrency = list
       listCoupleCurrency.forEach(element => {
         try {
           let currency = new CoupleCurrency(CoupleCurrencyData(element))

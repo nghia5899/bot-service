@@ -8,18 +8,18 @@ let jobAddHistoryMinute = new cronJob.CronJob({
     cloneHistoryService.jobAddHistoryMinute().then(() => {
       cloneHistoryService.deleteLastHistoryMinute()
     })
-    getTime()
+    console.log(`History minute - ${getTime()}`)
   },
   timeZone: 'Asia/Ho_Chi_Minh'
 })
 
 let jobAddHistoryHour = new cronJob.CronJob({
-  cronTime: '*/30 * * * *', 
+  cronTime: '*/20 * * * *', 
   onTick: function() {
     cloneHistoryService.jobAddHistoryHour().then(() => {
       cloneHistoryService.deleteLastHistoryHour()
     })
-    getTime()
+    console.log(`History hour - ${getTime()}`)
   },
   timeZone: 'Asia/Ho_Chi_Minh'
 })
@@ -28,14 +28,14 @@ let jobGetSymbolsPrice = new cronJob.CronJob({
   cronTime: '*/1 * * * *', 
   onTick: function() {
     coinService.initCoin()
-    getTime()
+    console.log(`Price - ${getTime()}`)
   },
   timeZone: 'Asia/Ho_Chi_Minh'
 })
 
 function getTime() {
   let today = new Date();
-  console.log(`${today} ${Date.now()}`)
+  return `${today} ${Date.now()}`
 }
 
 let jobController = {

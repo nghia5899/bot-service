@@ -12,8 +12,8 @@ let CloneHistoryService = {
     try {
       let response = await cloneDataModel.historyMinute(currencyFrom, currencyTo, limit)
       if (response[1]) {
-        let listTime = JSON.parse(response[1]).Data.Data
-        if (listTime.length) {
+        let listTime = response[1].Data.Data
+        if (listTime?.length) {
           for (let i = listTime.length - 1; i >= 0; i--) {
             let history = new History(HistoryData(listTime[i],currencyFrom,currencyTo, true))
             history.save((err) => {
@@ -51,8 +51,8 @@ let CloneHistoryService = {
     try {
       let response = await cloneDataModel.historyHour(currencyFrom, currencyTo, limit)
       if (response[1]) {
-        let listTime = JSON.parse(response[1]).Data.Data
-        if (listTime.length != undefined && listTime.length != 0) {
+        let listTime = response[1].Data.Data
+        if (listTime?.length) {
           for (let i = listTime.length - 1; i >= 0; i--) {
             let history = new History(HistoryData(listTime[i],currencyFrom,currencyTo, false))
             history.save((err) => {
