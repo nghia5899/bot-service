@@ -53,7 +53,7 @@ async function sendrequest(option) {
     request(option, function (err, res, body) {
       if (err) reject(err)
       else 
-        resolve([res, body])
+        resolve([res, JSON.parse(body)])
     })
   })
 }

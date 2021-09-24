@@ -41,8 +41,8 @@ let coinService = {
       }
       let response = await cloneDataModel.listSymbolsPrice(listCoin)
       if (response[1]) {
-        if (response[1].Response) return
-        let listSymbolsPrice = Object.entries(JSON.parse(response[1]))
+        if (response[1]?.Response) return
+        let listSymbolsPrice = Object.entries(response[1])
         new Map(listSymbolsPrice).forEach((value, key) => {
           let coin = new CoinData({code: key, price: value.USD})
           coin.save((err) => {
@@ -67,12 +67,9 @@ let coinService = {
       if (listCoin.length) {
         listCoin.forEach(element => {
           let coin = new CoinData({code: element, price: 0})
-          coin.save((err) => {
-            if (!err) {
-              this.initCoin()
-            }
-          })
+          coin.save((err) => {})
         })
+        this.initCoin()
       }
     } catch (e) {
       console.log(e)
