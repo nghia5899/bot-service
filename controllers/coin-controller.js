@@ -56,6 +56,15 @@ class CoinController {
     }
   }
 
+  async getCurrencyByCode(req, res) {
+    try {
+      let response = await coinService.getCurrencyByCode(req.query.code)
+      return res.json(new ResponseData(true, '', response).toJson())
+    } catch (error) {
+      return res.json(new ResponseData(false, error).toJson())
+    }
+  }
+
 }
 
 module.exports = new CoinController

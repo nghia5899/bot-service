@@ -8,7 +8,7 @@ const currencyService = require('./services/currency-service')
 const coinService = require('./services/coin-service')
 const app = express();
 
-const port = process.env.CONFIG_PORT || 3001;
+const port = 3001;
 
 require('./config/init-mongodb')
 
