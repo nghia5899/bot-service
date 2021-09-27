@@ -5,6 +5,8 @@ const currencyController = require('../controllers/currency-controller')
 
 router.post('/', currencyController.addCoupleCurrency)
 
+router.get('/currency-info', currencyController.getCurrencyByContractAddress)
+
 router.delete('/', currencyController.deleteCoupleCurrency)
 
 router.use('/', (req, res) => {

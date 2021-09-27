@@ -1,4 +1,4 @@
-const {ResponseData} = require('../helpers/response-data')
+const { ResponseData } = require('../helpers/response-data')
 const currencyService = require('../services/currency-service')
 
 class CurrencyController {
@@ -23,6 +23,27 @@ class CurrencyController {
       return res.json(new ResponseData(false, e).toJson())
     }
   }
-}
 
+  async getCurrencyByContractAddress(req, res) {
+    try {
+      let contractAddress = req.query.contractAddress;
+      let network = req.query.network;
+      if (network == 'tron') {
+        let result = await currencyService.getTRC20TokenInfo(contractAddress, network);
+        if (result != null) {
+          return res.json(new ResponseData(true, "success", result).toJson());
+        }
+      } else {
+        let result = await currencyService.getEthereumTokenInfo(contractAddress, network);
+        if (result != null) {
+          return res.json(new ResponseData(true, "success", result).toJson());
+        }
+      }
+      return res.json(new ResponseData(false, "Currency information not found").toJson());
+    } catch (e) {
+      console.log(e)
+      return res.json(new ResponseData(false, e).toJson());
+    }
+  }
+}
 module.exports = new CurrencyController
