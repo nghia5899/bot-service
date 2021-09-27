@@ -25,10 +25,7 @@ route(app);
 currencyService.initCoupleCurrency()
 
 coinService.initCoin()
-jobService.startjobAddHistoryMinute()
-jobService.startjobAddHistoryHour()
-jobService.startJobGetSymbolsPrice()
 
 app.listen(port, function() {
-    console.log('Node server running @ http://localhost:'+ port + '...');
+    console.log('Node server running @ http://localhost:'+ port + '...')
 })
