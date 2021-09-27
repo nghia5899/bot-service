@@ -7,7 +7,8 @@ let CoinSchema = new mongoose.Schema({
   feeType: {type: Number, required:false, default: 0},
   feeFrom: {type: String, required:false, default: '',},
   feeFix: {type: Number, required:false, default: null},
-  feePercent: {type: Number, required:false, default: null}
+  feePercent: {type: Number, required:false, default: null},
+  coinType: {type: String, required:false, default: null}
 }, {timestamps: true});
 
 var Coin = mongoose.model("Coin", CoinSchema)
