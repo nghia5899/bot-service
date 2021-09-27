@@ -69,7 +69,9 @@ let currencyService = {
           },
         ]
         this.insertCoupleCurrency(listCoin)
-      } 
+      } else {
+        cloneHistoryService.refreshAllHistory()
+      }
     } catch (e) {
       console.log(e)
       throw e

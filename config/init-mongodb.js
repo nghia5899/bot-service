@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const server = process.env.MONGODB_URL || 'mongodb://127.0.0.1:27017'
 const database =  process.env.MONGODB_DATABASE || 'crypto'
+const jobService = require('../services/job-service')
+
 console.log(server)
 mongoose
   .connect(server + '/' + database, {
@@ -9,15 +11,15 @@ mongoose
     useFindAndModify: false,
     useCreateIndex: true,
   })
-  .then(() => {
-    console.log('mongodb connected.......')
-  })
   .catch((err) => {
     console.log(err.message)
   })
 
 mongoose.connection.on('connected', () => {
-  console.log('mongodb connected to db')
+  console.log('mongodb connected.......')
+  jobService.startjobAddHistoryMinute()
+  jobService.startjobAddHistoryHour()
+  jobService.startJobGetSymbolsPrice()
 })
 
 mongoose.connection.on('error', (err) => {
@@ -26,6 +28,9 @@ mongoose.connection.on('error', (err) => {
 
 mongoose.connection.on('disconnected', () => {
   console.log('mongodb connection is disconnected.')
+  jobService.stopJobAddHistoryMinute()
+  jobService.stopJobAddHistoryHour()
+  jobService.stopJobGetSymbolsPrice()
 })
 
 module.exports = mongoose.connection

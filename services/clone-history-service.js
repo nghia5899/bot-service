@@ -13,32 +13,30 @@ let CloneHistoryService = {
       let response = await cloneDataModel.historyMinute(currencyFrom, currencyTo, limit)
       if (response[1]) {
         let listTime = response[1].Data.Data
-        if (listTime?.length) {
-          for (let i = listTime.length - 1; i >= 0; i--) {
-            let history = new History(HistoryData(listTime[i],currencyFrom,currencyTo, true))
-            history.save((err) => {
-              if (err) {
-                let filter = {
-                  time: parseInt(listTime[i].time),
-                  isminute: true,
-                  currencyfrom: currencyFrom,
-                  currencyto: currencyTo,
-                }
-                let update = {$set: {
-                  conversionType: listTime[i].conversionType,
-                  high: listTime[i].high,
-                  low: listTime[i].low,
-                  volumefrom: listTime[i].volumefrom,
-                  volumeto: listTime[i].volumeto,
-                }}
-                History.collection
-                  .findOneAndUpdate(filter, update, {new: true})
-                  .catch((err) => {
-                    console.log(err)
-                  })
+        for (let i = listTime.length - 1; i >= 0; i--) {
+          let history = new History(HistoryData(listTime[i],currencyFrom,currencyTo, true))
+          history.save((err) => {
+            if (err) {
+              let filter = {
+                time: parseInt(listTime[i].time),
+                isminute: true,
+                currencyfrom: currencyFrom,
+                currencyto: currencyTo,
               }
-            })
-          }
+              let update = {$set: {
+                conversionType: listTime[i].conversionType,
+                high: listTime[i].high,
+                low: listTime[i].low,
+                volumefrom: listTime[i].volumefrom,
+                volumeto: listTime[i].volumeto,
+              }}
+              History.collection
+                .findOneAndUpdate(filter, update, {new: true})
+                .catch((err) => {
+                  console.log(err)
+                })
+            }
+          })
         }
       }
     } catch (e) {
@@ -52,32 +50,30 @@ let CloneHistoryService = {
       let response = await cloneDataModel.historyHour(currencyFrom, currencyTo, limit)
       if (response[1]) {
         let listTime = response[1].Data.Data
-        if (listTime?.length) {
-          for (let i = listTime.length - 1; i >= 0; i--) {
-            let history = new History(HistoryData(listTime[i],currencyFrom,currencyTo, false))
-            history.save((err) => {
-              if (err) {
-                let filter = {
-                  time: parseInt(listTime[i].time),
-                  isminute: false,
-                  currencyfrom: currencyFrom,
-                  currencyto: currencyTo,
-                }
-                let update = {$set: {
-                  conversionType: listTime[i].conversionType,
-                  high: listTime[i].high,
-                  low: listTime[i].low,
-                  volumefrom: listTime[i].volumefrom,
-                  volumeto: listTime[i].volumeto,
-                }}
-                History.collection
-                  .findOneAndUpdate(filter, update, {new: true})
-                  .catch((err) => {
-                    console.log(err)
-                  })
+        for (let i = listTime.length - 1; i >= 0; i--) {
+          let history = new History(HistoryData(listTime[i],currencyFrom,currencyTo, false))
+          history.save((err) => {
+            if (err) {
+              let filter = {
+                time: parseInt(listTime[i].time),
+                isminute: false,
+                currencyfrom: currencyFrom,
+                currencyto: currencyTo,
               }
-            })
-          }
+              let update = {$set: {
+                conversionType: listTime[i].conversionType,
+                high: listTime[i].high,
+                low: listTime[i].low,
+                volumefrom: listTime[i].volumefrom,
+                volumeto: listTime[i].volumeto,
+              }}
+              History.collection
+                .findOneAndUpdate(filter, update, {new: true})
+                .catch((err) => {
+                  console.log(err)
+                })
+            }
+          })
         }
       }
     } catch (e) {
