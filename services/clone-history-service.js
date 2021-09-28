@@ -151,7 +151,7 @@ let CloneHistoryService = {
     try {
       let listCoupleCurrency = await CoupleCurrency.find({}, {_id: 0})
       listCoupleCurrency.forEach(element => {
-        this.addHistoryMinute(element.currencyfrom, element.currencyto, 5)
+        this.addHistoryMinute(element.currencyfrom, element.currencyto, 10)
       })
     } catch (e) {
       console.log(e)
