@@ -7,6 +7,8 @@ router.post('/', currencyController.addCoupleCurrency)
 
 router.get('/currency-info', currencyController.getCurrencyByContractAddress)
 
+router.post('/validate-address', currencyController.validateAddress)
+
 router.delete('/', currencyController.deleteCoupleCurrency)
 
 router.use('/', (req, res) => {
