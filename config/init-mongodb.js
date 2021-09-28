@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const server = process.env.MONGODB_URL || 'mongodb://127.0.0.1:27017'
 const database =  process.env.MONGODB_DATABASE || 'crypto'
 const jobService = require('../services/job-service')
+const cloneHistoryService = require('../services/clone-history-service')
 
 console.log(server)
 mongoose
@@ -17,6 +18,7 @@ mongoose
 
 mongoose.connection.on('connected', () => {
   console.log('mongodb connected.......')
+  cloneHistoryService.refreshAllHistory()
   jobService.startjobAddHistoryMinute()
   jobService.startjobAddHistoryHour()
   jobService.startJobGetSymbolsPrice()

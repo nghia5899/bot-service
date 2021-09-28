@@ -3,32 +3,43 @@ const cloneHistoryService = require('./clone-history-service')
 const coinService = require('./coin-service')
 
 let jobAddHistoryMinute = new cronJob.CronJob({
-  cronTime: '*/1 * * * *', 
-  onTick: function() {
-    cloneHistoryService.jobAddHistoryMinute().then(() => {
-      cloneHistoryService.deleteLastHistoryMinute()
-    })
+  cronTime: '*/5 * * * *', 
+  onTick: async function() {
     console.log(`History minute - ${getTime()}`)
+    try {
+      await cloneHistoryService.jobAddHistoryMinute()
+      cloneHistoryService.deleteLastHistoryMinute()
+    } catch (e) {
+      console.log(e)
+    }
   },
   timeZone: 'Asia/Ho_Chi_Minh'
 })
 
 let jobAddHistoryHour = new cronJob.CronJob({
-  cronTime: '*/20 * * * *', 
-  onTick: function() {
-    cloneHistoryService.jobAddHistoryHour().then(() => {
-      cloneHistoryService.deleteLastHistoryHour()
-    })
+  cronTime: '*/30 * * * *', 
+  onTick: async function() {
     console.log(`History hour - ${getTime()}`)
+    try {
+      await cloneHistoryService.jobAddHistoryHour()
+      cloneHistoryService.deleteLastHistoryHour()
+    } catch (e) {
+      console.log(e)
+    }
+  
   },
   timeZone: 'Asia/Ho_Chi_Minh'
 })
 
 let jobGetSymbolsPrice = new cronJob.CronJob({
-  cronTime: '*/1 * * * *', 
+  cronTime: '*/5 * * * *', 
   onTick: function() {
-    coinService.initCoin()
     console.log(`Price - ${getTime()}`)
+    try {
+      coinService.initCoin()
+    } catch (e) {
+      console.log(e)
+    }
   },
   timeZone: 'Asia/Ho_Chi_Minh'
 })
@@ -51,6 +62,12 @@ let jobController = {
     console.log('----------------------')
     jobAddHistoryHour.start()
   },
+  startJobGetSymbolsPrice() {
+    console.log('-------------------------------')
+    console.log('| Start Job Get Symbols Price |')
+    console.log('-------------------------------')
+    jobGetSymbolsPrice.start()
+  },
   stopJobAddHistoryMinute() {
     console.log('-----------------------')
     console.log('| Stop Job Add Minute |')
@@ -63,17 +80,11 @@ let jobController = {
     console.log('---------------------')
     jobAddHistoryHour.stop()
   },
-  startJobGetSymbolsPrice() {
-    console.log('-------------------------------')
-    console.log('| Start Job Get Symbols Price |')
-    console.log('-------------------------------')
-    jobGetSymbolsPrice.start()
-  },
   stopJobGetSymbolsPrice() {
     console.log('-------------------------------')
-    console.log('| Start Job Get Symbols Price |')
+    console.log('| Stop Job Get Symbols Price |')
     console.log('-------------------------------')
-    jobGetSymbolsPrice.start()
+    jobGetSymbolsPrice.stop()
   }
 }
 
