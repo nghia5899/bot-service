@@ -1,5 +1,6 @@
 const { ResponseData } = require('../helpers/response-data')
 const currencyService = require('../services/currency-service')
+const WAValidator = require('@swyftx/api-crypto-address-validator')
 
 class CurrencyController {
 
@@ -43,6 +44,25 @@ class CurrencyController {
     } catch (e) {
       console.log(e)
       return res.json(new ResponseData(false, e).toJson());
+    }
+  }
+
+  async validateAddress(req, res) {
+    try {
+      let address = req.body.address;
+      let currencySymbol = req.body.currencySymbol;
+      let network = req.body.network;
+      const valid = WAValidator.validate(address, currencySymbol, network);
+      if (valid) {
+        return res.json(new ResponseData(true, "This is a valid address", true).toJson());
+      } else {
+        // Address INVALID
+        return res.json(new ResponseData(false, "This is a invalid address", false).toJson());
+      }
+    } catch (e) {
+      console.log(e)
+      // Can not validate Address
+      return res.json(new ResponseData(true, "Can not validate Address", true).toJson());
     }
   }
 }
