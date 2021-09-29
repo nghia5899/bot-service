@@ -3,7 +3,6 @@ require('dotenv').config()
 const bodyParser = require('body-parser')
 const route = require('./routes/index-routes')
 const path = require('path')
-const jobService = require('./services/job-service')
 const currencyService = require('./services/currency-service')
 const coinService = require('./services/coin-service')
 const app = express();

@@ -15,7 +15,7 @@ let CloneHistoryService = {
         let listTime = response[1].Data.Data || []
         for (let i = listTime.length - 1; i >= 0; i--) {
           let history = new History(HistoryData(listTime[i],currencyFrom,currencyTo, true))
-          history.save((err) => {
+          History.collection.insertOne(history, (err) => {
             if (err) {
               let filter = {
                 time: parseInt(listTime[i].time),
@@ -52,7 +52,7 @@ let CloneHistoryService = {
         let listTime = response[1].Data.Data || []
         for (let i = listTime.length - 1; i >= 0; i--) {
           let history = new History(HistoryData(listTime[i],currencyFrom,currencyTo, false))
-          history.save((err) => {
+          History.collection.insertOne(history, (err) => {
             if (err) {
               let filter = {
                 time: parseInt(listTime[i].time),
