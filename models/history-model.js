@@ -1,4 +1,5 @@
 var mongoose = require("mongoose")
+const AutoIncrement = require('mongoose-sequence')(mongoose)
 var historyModel = {}
 
 var HistorySchema = new mongoose.Schema({
