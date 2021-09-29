@@ -1,4 +1,5 @@
 const request = require('request')
+const config = require('../config/config')
 
 let cloneDataModel = {
   historyMinute(fromCurrency, toCurrency, limit) {
@@ -8,6 +9,9 @@ let cloneDataModel = {
     return sendrequest({
       uri: URL,
       method: 'GET',
+      headers: {
+        'authorization': `Apikey ${config.API_KEY}`
+        }
       }
     )
   },
@@ -28,7 +32,10 @@ let cloneDataModel = {
     return sendrequest({
       uri: URL,
       method: 'GET',
-      }
+      headers: {
+        'authorization': `Apikey ${config.API_KEY}`
+        }
+      },
     )
   },
 
@@ -42,6 +49,9 @@ let cloneDataModel = {
     return sendrequest({
       uri: URL,
       method: 'GET',
+      headers: {
+        'authorization': `Apikey ${config.API_KEY}`
+        }
       }
     )
   }
