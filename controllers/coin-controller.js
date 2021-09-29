@@ -1,5 +1,4 @@
-const {ResponseData} = require('../helpers/response-data')
-const { ResponseDataWithPagination } = require('../helpers/response-data')
+const { ResponseData, ResponseDataWithPagination } = require('../helpers/response-data')
 const coinService = require('../services/coin-service')
 
 class CoinController {
