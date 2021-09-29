@@ -14,6 +14,8 @@ router.get('/fee', coinController.feeWithdraw)
 
 router.get('/currency', coinController.getCurrencyByCode)
 
+router.get('/list-transactions', coinController.getListTransactions)
+
 router.use('/', (req, res) => {
   return res.status(404).json(new ResponseData(false, "Not found").toJson())
 })

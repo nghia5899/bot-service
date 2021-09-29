@@ -48,7 +48,7 @@ class CoinController {
   async feeWithdraw(req, res) {
     try {
       let response = await coinService.getFee()
-      return res.json(new ResponseData(true, "",response).toJson())
+      return res.json(new ResponseData(true, "", response).toJson())
     } catch (e) {
       console.log(e)
       return res.json(new ResponseData(false, e).toJson())
@@ -59,6 +59,21 @@ class CoinController {
     try {
       let response = await coinService.getCurrencyByCode(req.query.code)
       return res.json(new ResponseData(true, '', response).toJson())
+    } catch (error) {
+      return res.json(new ResponseData(false, error).toJson())
+    }
+  }
+
+  async getListTransactions(req, res) {
+    try {
+      let address = req.query.address;
+      let contractAddress = req.query.contractAddress;
+      let network = req.query.network;
+      let page = req.query.page;
+      let size = req.query.size;
+      let fingerprint = req.query.fingerprint;
+      let response = await coinService.getListTransactions(address, contractAddress, network, page, size, fingerprint);
+      return res.json(new ResponseData(true, 'Success', response).toJson());
     } catch (error) {
       return res.json(new ResponseData(false, error).toJson())
     }
