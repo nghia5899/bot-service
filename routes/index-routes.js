@@ -2,12 +2,9 @@ const historyRoutes = require('./history-route')
 const currencyRoutes = require('./currency-route')
 const coinRoutes = require('./coin-route')
 const jobRoutes = require('./job-routes')
-const authRoutes = require('./auth-route')
 const {ResponseData} = require('../helpers/response-data')
 
 function route(app) {
-
-  app.use('/auth', authRoutes)
 
   app.use('/history', historyRoutes)
 

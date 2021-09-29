@@ -9,7 +9,7 @@ let CoinSchema = new mongoose.Schema({
   feeFix: {type: Number, required:false, default: null},
   feePercent: {type: Number, required:false, default: null},
   coinType: {type: String, required:false, default: null}
-}, {timestamps: true})
+}, {timestamps: true});
 
 var Coin = mongoose.model("Coin", CoinSchema)
 Coin.collection.createIndex({

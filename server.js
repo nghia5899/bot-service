@@ -3,6 +3,7 @@ require('dotenv').config()
 const bodyParser = require('body-parser')
 const route = require('./routes/index-routes')
 const path = require('path')
+const jobService = require('./services/job-service')
 const currencyService = require('./services/currency-service')
 const coinService = require('./services/coin-service')
 const app = express();
@@ -11,13 +12,13 @@ const port = 3001;
 
 require('./config/init-mongodb')
 
-app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
-app.use(express.json())
+app.use(express.json());
 
 route(app);
 
