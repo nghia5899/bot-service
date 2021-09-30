@@ -6,7 +6,11 @@ class HistoryController {
   
   async listHistoryMinute(req, res) {
     let currencyFrom = req.query.currencyFrom
+    currencyFrom = currencyFrom.toUpperCase()
+    if (currencyFrom.toUpperCase() == 'BSC') currencyFrom = 'BNB'
     let currencyTo = req.query.currencyTo
+    currencyTo = currencyTo.toUpperCase()
+
     let limit = req.query.limit
     try {
       let response = await historyService.getListHistoryMinute(currencyFrom, currencyTo, limit)
@@ -18,8 +22,12 @@ class HistoryController {
   }
 
   async listHistoryHour(req, res) {
-    var currencyFrom = req.query.currencyFrom
-    var currencyTo = req.query.currencyTo
+    let currencyFrom = req.query.currencyFrom
+    currencyFrom = currencyFrom.toUpperCase()
+    if (currencyFrom.toUpperCase() == 'BSC') currencyFrom = 'BNB'
+    let currencyTo = req.query.currencyTo
+    currencyTo = currencyTo.toUpperCase()
+    
     let limit = req.query.limit
     try {
       let response = await historyService.getListHistoryHour(currencyFrom, currencyTo, limit)
