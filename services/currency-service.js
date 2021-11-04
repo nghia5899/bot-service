@@ -93,13 +93,13 @@ let currencyService = {
         else {
           try {
             let result = JSON.parse(body);
-            let tokenInfo = result?.data[0]?.tokenInfo;
+            let tokenInfo = result.data[0].tokenInfo;
             if (tokenInfo.tokenAbbr) {
               resolve({
-                'name': tokenInfo?.tokenName ?? '',
-                'symbol': tokenInfo?.tokenAbbr ?? '',
-                'decimals': tokenInfo?.tokenDecimal ?? 0,
-                'logo': tokenInfo?.tokenLogo ?? '',
+                'name': tokenInfo.tokenName || '',
+                'symbol': tokenInfo.tokenAbbr || '',
+                'decimals': tokenInfo.tokenDecimal || 0,
+                'logo': tokenInfo.tokenLogo || '',
               });
             }
             resolve(null);
@@ -170,7 +170,7 @@ async function getTokenImageByCoingecko(contractAddress, networkType) {
       })
     });
     let result = JSON.parse(response);
-    return result?.image?.small ?? (result?.image.thumb ?? '');
+    return result.image.small || (result.image.thumb || '');
   } catch (err) {
     console.log(err)
     return '';

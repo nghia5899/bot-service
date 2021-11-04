@@ -7,15 +7,15 @@ const {ResponseData} = require('../helpers/response-data')
 
 function route(app) {
 
-  app.use('/auth', authRoutes)
+  app.use('/api/v1/auth', authRoutes)
 
-  app.use('/history', historyRoutes)
+  app.use('/api/v1/history', historyRoutes)
 
-  app.use('/currency', currencyRoutes)
+  app.use('/api/v1/currency', currencyRoutes)
 
-  app.use('/coin', coinRoutes)
+  app.use('/api/v1/coin', coinRoutes)
 
-  app.use('/job', jobRoutes)
+  app.use('/api/v1/job', jobRoutes)
 
   app.use('/', (req, res) => {
     return res.status(404).json(new ResponseData(false, "Not found").toJson())

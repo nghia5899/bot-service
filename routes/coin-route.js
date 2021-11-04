@@ -3,6 +3,7 @@ const router = express.Router()
 const {ResponseData} = require('../helpers/response-data')
 const coinController = require('../controllers/coin-controller')
 const authController = require('../controllers/auth-controller')
+const feeController = require('../controllers/fee-controller')
 
 router.get('/', coinController.listAllCoin)
 
@@ -12,7 +13,8 @@ router.delete('/', authController.isAuth, coinController.deleteCoin)
 
 router.get('/fee', coinController.feeWithdraw)
 
-router.get('/currency', coinController.getCurrencyByCode)
+router.get('/currency', feeController.getFee)
+router.post('/currency/xrp', feeController.getXrpFee)
 
 router.get('/list-transactions', coinController.getListTransactions)
 

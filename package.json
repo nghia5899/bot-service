@@ -12,7 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "@swyftx/api-crypto-address-validator": "^1.13.1",
+    "axios": "^0.24.0",
     "bcrypt": "^5.0.1",
+    "bignumber.js": "^9.0.1",
     "cron": "^1.8.2",
     "dotenv": "^10.0.0",
     "erc-20-abi": "^1.0.0",
@@ -25,6 +27,8 @@
     "nodemon": "^2.0.12",
     "path": "^0.12.7",
     "request": "^2.88.2",
+    "ripple-lib": "*",
+    "stellar-sdk": "^8.3.0",
     "web3": "^1.5.3"
   }
 }

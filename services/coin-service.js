@@ -150,7 +150,7 @@ async function getListTransactionsEthereum(address, contractAddress, network, pa
       URL = `https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=W8V2XYWK3IWRP53ZB2VX7T2UNKKHBAIEBC`;
     }
     let response = await sendrequest({ uri: URL, method: 'GET' })
-    var listTransactions = response?.result;
+    var listTransactions = response.result;
     var result = [];
     for (var i in listTransactions) {
       const item = listTransactions[i];
@@ -176,9 +176,9 @@ async function getListTransactionsEthereum(address, contractAddress, network, pa
 
 async function getListTransactionsTron(address, contractAddress, size, fingerprint) {
   try {
-    URL = `https://api.trongrid.io/v1/accounts/${address}/transactions/trc20?contract_address=${contractAddress}&limit=${size}&fingerprint=${fingerprint ?? ''}`;
+    URL = `https://api.trongrid.io/v1/accounts/${address}/transactions/trc20?contract_address=${contractAddress}&limit=${size}&fingerprint=${fingerprint || ''}`;
     let response = await sendrequest({ uri: URL, method: 'GET' })
-    var listTransactions = response?.data;
+    var listTransactions = response.data || [];
     var result = [];
     for (var i in listTransactions) {
       const item = listTransactions[i];
@@ -189,9 +189,9 @@ async function getListTransactionsTron(address, contractAddress, size, fingerpri
           "value": item.value,
           "timeStamp": Math.floor(item.block_timestamp / 1000),
           "transaction_id": item.transaction_id,
-          "tokenName": item?.token_info?.name,
-          "tokenSymbol": item?.token_info?.symbol,
-          "tokenDecimal": item?.token_info?.decimals,
+          "tokenName": item.token_info.name,
+          "tokenSymbol": item.token_info.symbol,
+          "tokenDecimal": item.token_info.decimals,
           "type": item.type,
         }
       )
@@ -207,14 +207,14 @@ async function getListTransactionsBTC(address) {
   try {
     URL = `https://blockchain.info/rawaddr/${address}`;
     let response = await sendrequest({ uri: URL, method: 'GET' })
-    var listTransactions = response?.txs;
+    var listTransactions = response.txs || [];
     var result = [];
     for (var i in listTransactions) {
       const item = listTransactions[i];
       result.push(
         {
-          "from": item.inputs[0]?.prev_out?.addr,
-          "to": item.out[0]?.addr,
+          "from": item.inputs[0].prev_out.addr,
+          "to": item.out[0].addr,
           "transaction_id": item.hash,
           "timeStamp": item.time,
           "fee": item.fee,
