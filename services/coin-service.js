@@ -2,6 +2,7 @@ const { Coin } = require('../models/coin')
 const cloneDataModel = require('./clone-data-service')
 const request = require('request')
 const { getListTransactions } = require('../controllers/coin-controller')
+const config = require('../config/config')
 
 let coinService = {
 
@@ -115,16 +116,30 @@ let coinService = {
     })
   },
 
-  async getListTransactions(address, contractAddress, network, page, size, fingerprint) {
+  async getListTransactions(address, code, contractAddress, network, page, size, fingerprint) {
     try {
+      switch (code.toLowerCase()) {
+        case 'trx':
+          return await getListTransactionsTRX(address, size, page);
+        case 'btc':
+          return await getListTransactionsBTC(address, page, size);
+        case 'eth':
+          return await getListTransactionsETH(address, page, size);
+        case 'bsc':
+          return await getListTransactionsBSC(address, page, size);
+        case 'usdt_erc20':
+          return await getListTransactionsEthereum(address, '0xdac17f958d2ee523a2206206994597c13d831ec7', 'ethereum', page, size);
+        case 'usdt_trc20':
+          return await getListTransactionsTRC20(address, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', size, fingerprint);
+        default:
+          break;
+      }
       switch (network) {
         case 'ethereum':
         case 'binance-smart-chain':
           return await getListTransactionsEthereum(address, contractAddress, network, page, size);
         case 'tron':
-          return await getListTransactionsTron(address, contractAddress, size, fingerprint);
-        case 'btc':
-          return await getListTransactionsBTC(address);
+          return await getListTransactionsTRC20(address, contractAddress, size, fingerprint);
         default:
           break;
       }
@@ -145,12 +160,15 @@ function CoinData(coin) {
 
 async function getListTransactionsEthereum(address, contractAddress, network, page, size) {
   try {
-    URL = `https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=QDW5I33I3XG8AP7A2GWWJEGXW8K3H3JTUU`;
+    URL = `https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.ETHER_SCAN_API_KEY}`;
     if (network == 'binance-smart-chain') {
-      URL = `https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=W8V2XYWK3IWRP53ZB2VX7T2UNKKHBAIEBC`;
+      URL = `https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.BSC_SCAN_API_KEY}`;
     }
     let response = await sendrequest({ uri: URL, method: 'GET' })
     var listTransactions = response.result;
+    if (!Array.isArray(listTransactions)) {
+      return [];
+    }
     var result = [];
     for (var i in listTransactions) {
       const item = listTransactions[i];
@@ -159,11 +177,12 @@ async function getListTransactionsEthereum(address, contractAddress, network, pa
           "from": item.from,
           "to": item.to,
           "value": item.value,
-          "timeStamp": item.timeStamp,
+          "timeStamp": parseInt(item.timeStamp),
           "transaction_id": item.hash,
           "tokenName": item.tokenName,
           "tokenSymbol": item.tokenSymbol,
-          "tokenDecimal": item.tokenDecimal,
+          "tokenDecimal": parseInt(item.tokenDecimal),
+          "type": getTypeTransaction(address, item.from),
         }
       )
     }
@@ -174,11 +193,80 @@ async function getListTransactionsEthereum(address, contractAddress, network, pa
   }
 }
 
-async function getListTransactionsTron(address, contractAddress, size, fingerprint) {
+async function getListTransactionsETH(address, page, size) {
+  try {
+    URL = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.ETHER_SCAN_API_KEY}`;
+    let response = await sendrequest({ uri: URL, method: 'GET' })
+    var listTransactions = response.result;
+    if (!Array.isArray(listTransactions)) {
+      return [];
+    }
+    var result = [];
+    for (var i in listTransactions) {
+      const item = listTransactions[i];
+      result.push(
+        {
+          "from": item.from,
+          "to": item.to,
+          "value": item.value,
+          "fee": item.gasUsed,
+          "timeStamp": parseInt(item.timeStamp),
+          "transaction_id": item.hash,
+          "tokenName": 'Ethereum',
+          "tokenSymbol": 'eth',
+          "tokenDecimal": 18,
+          "type": getTypeTransaction(address, item.from),
+        }
+      )
+    }
+    return result;
+  } catch (err) {
+    console.log(err)
+    return null;
+  }
+}
+
+async function getListTransactionsBSC(address, page, size) {
+  try {
+    URL = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.BSC_SCAN_API_KEY}`;
+    let response = await sendrequest({ uri: URL, method: 'GET' })
+    var listTransactions = response.result;
+    if (!Array.isArray(listTransactions)) {
+      return [];
+    }
+    var result = [];
+    for (var i in listTransactions) {
+      const item = listTransactions[i];
+      result.push(
+        {
+          "from": item.from,
+          "to": item.to,
+          "value": item.value,
+          "fee": item.gasUsed,
+          "timeStamp": parseInt(item.timeStamp),
+          "transaction_id": item.hash,
+          "tokenName": 'Ethereum',
+          "tokenSymbol": 'eth',
+          "tokenDecimal": 18,
+          "type": getTypeTransaction(address, item.from),
+        }
+      )
+    }
+    return result;
+  } catch (err) {
+    console.log(err)
+    return null;
+  }
+}
+
+async function getListTransactionsTRC20(address, contractAddress, size, fingerprint) {
   try {
     URL = `https://api.trongrid.io/v1/accounts/${address}/transactions/trc20?contract_address=${contractAddress}&limit=${size}&fingerprint=${fingerprint || ''}`;
     let response = await sendrequest({ uri: URL, method: 'GET' })
     var listTransactions = response.data || [];
+    if (!Array.isArray(listTransactions)) {
+      return [];
+    }
     var result = [];
     for (var i in listTransactions) {
       const item = listTransactions[i];
@@ -192,7 +280,8 @@ async function getListTransactionsTron(address, contractAddress, size, fingerpri
           "tokenName": item.token_info.name,
           "tokenSymbol": item.token_info.symbol,
           "tokenDecimal": item.token_info.decimals,
-          "type": item.type,
+          // "type": (item.type || getTypeTransaction(address, item.from)).toLowerCase(),
+          "type": getTypeTransaction(address, item.from),
         }
       )
     }
@@ -203,10 +292,47 @@ async function getListTransactionsTron(address, contractAddress, size, fingerpri
   }
 }
 
-async function getListTransactionsBTC(address) {
+async function getListTransactionsTRX(address, size, page) {
   try {
-    URL = `https://blockchain.info/rawaddr/${address}`;
+    URL = `https://apilist.tronscan.org/api/transaction?sort=-timestamp&limit=${size}&start=${size * (page - 1)}&address=${address}`;
+    let response = await sendrequest({ uri: URL, method: 'GET' });
+    if (!Array.isArray(response.data)) {
+      return [];
+    }
+    var listTransactions = response.data || [];
+    var result = [];
+    for (var i in listTransactions) {
+      const item = listTransactions[i];
+      result.push(
+        {
+          "from": item.ownerAddress,
+          "to": item.toAddress,
+          "value": item.amount,
+          "fee": item.cost.fee.toString(),
+          "timeStamp": Math.floor(item.timestamp / 1000),
+          "transaction_id": item.hash,
+          "tokenName": 'Tron',
+          "tokenSymbol": 'trx',
+          "tokenDecimal": 6,
+          // "type": (item.type || getTypeTransaction(address, item.ownerAddress)).toLowerCase(),
+          "type": getTypeTransaction(address, item.ownerAddress),
+        }
+      )
+    }
+    return result;
+  } catch (err) {
+    console.log(err)
+    return null;
+  }
+}
+
+async function getListTransactionsBTC(address, page, size) {
+  try {
+    URL = `https://blockchain.info/rawaddr/${address}?limit=${size}&offset=${size * (page - 1)}`;
     let response = await sendrequest({ uri: URL, method: 'GET' })
+    if (!Array.isArray(response.txs)) {
+      return [];
+    }
     var listTransactions = response.txs || [];
     var result = [];
     for (var i in listTransactions) {
@@ -217,8 +343,12 @@ async function getListTransactionsBTC(address) {
           "to": item.out[0].addr,
           "transaction_id": item.hash,
           "timeStamp": item.time,
-          "fee": item.fee,
-          "value": item.result,
+          "fee": item.fee.toString(),
+          "value": item.result.toString(),
+          "tokenName": 'Bitcoin',
+          "tokenSymbol": 'BTC',
+          "tokenDecimal": 8,
+          "type": getTypeTransaction(address, item.inputs[0].prev_out.addr),
         }
       )
     }
@@ -227,6 +357,13 @@ async function getListTransactionsBTC(address) {
     console.log(err)
     return null;
   }
+}
+
+function getTypeTransaction(address, fromAdress) {
+  if (address == fromAdress) {
+    return 'transfer'
+  }
+  return 'deposit'
 }
 
 async function sendrequest(option) {
