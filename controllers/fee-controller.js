@@ -12,7 +12,7 @@ module.exports = {
         response.feeFix = error
       }
       response.minimunBalance = 0
-      res.json(response)
+      res.json(new ResponseData(true, '', response).toJson())
     }).catch(err => {
       console.log(err)
       res.json(new ResponseData(false, null, err.message).toJson())
@@ -21,7 +21,7 @@ module.exports = {
   getFee: function(req, res) {
     let code = req.query.networkType || req.query.code
     code = code.toUpperCase()
-    feeService.getFee(code.toUpperCase()).then(async rs => {
+	  feeService.getFee(code.toUpperCase()).then(async rs => {
       const response = rs
       switch (code) {
         case 'TRC20':
@@ -109,7 +109,8 @@ module.exports = {
           response.minimunBalance = 0
           break
       }
-      res.json(response)
+
+      res.json(new ResponseData(true, '', response).toJson())
     }).catch(err => {
       console.log(err)
       res.json(new ResponseData(false, null, err.message).toJson())
