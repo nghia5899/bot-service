@@ -131,6 +131,12 @@ let coinService = {
           return await getListTransactionsEthereum(address, '0xdac17f958d2ee523a2206206994597c13d831ec7', 'ethereum', page, size);
         case 'usdt_trc20':
           return await getListTransactionsTRC20(address, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', size, fingerprint);
+        case 'matic':
+          return await getListTransactionsPolygon(address, page, size);
+        // case 'ltc':
+        //   return await getListTransactionByBlockIO(address, config.LTC_BLOCK_API_KEY, fingerprint, code);
+        // case 'doge':
+        //   return await getListTransactionByBlockIO(address, config.DOGE_BLOCK_API_KEY, fingerprint, code);
         default:
           break;
       }
@@ -358,6 +364,72 @@ async function getListTransactionsBTC(address, page, size) {
     return null;
   }
 }
+
+async function getListTransactionsPolygon(address, page, size) {
+  try {
+    URL = `https://api.polygonscan.com/api?module=account&action=txlist&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.POLYGON_SCAN_API_KEY}`;
+    let response = await sendrequest({ uri: URL, method: 'GET' })
+    var listTransactions = response.result;
+    if (!Array.isArray(listTransactions)) {
+      return [];
+    }
+    var result = [];
+    for (var i in listTransactions) {
+      const item = listTransactions[i];
+      result.push(
+        {
+          "from": item.from,
+          "to": item.to,
+          "value": item.value,
+          "fee": item.gasUsed,
+          "timeStamp": parseInt(item.timeStamp),
+          "transaction_id": item.hash,
+          "tokenName": 'Ethereum',
+          "tokenSymbol": 'eth',
+          "tokenDecimal": 18,
+          "type": getTypeTransaction(address, item.from),
+        }
+      )
+    }
+    return result;
+  } catch (err) {
+    console.log(err)
+    return null;
+  }
+}
+
+// async function getListTransactionByBlockIO(address, key, before_tx, code) {
+//   try {
+//     URL = `https://block.io/api/v2/get_transactions/?api_key=${key}&type=sent&before_tx=${before_tx}&addresses=${address}`;
+//     let response = await sendrequest({ uri: URL, method: 'GET' })
+//     var listTransactions = response.data.txs;
+//     if (!Array.isArray(listTransactions)) {
+//       return [];
+//     }
+//     var result = [];
+//     for (var i in listTransactions) {
+//       const item = listTransactions[i];
+//       result.push(
+//         {
+//           "from": item.senders,
+//           "to": item.amounts_sent[0].recipient,
+//           "value": item.amounts_sent[0].amount,
+//           "fee": (parseFloat(item.total_amount_sent) - parseFloat(item.amounts_sent[0].amount)).toString(),
+//           "timeStamp": parseInt(item.time),
+//           "transaction_id": item.txid,
+//           "tokenName": code,
+//           "tokenSymbol": code,
+//           "tokenDecimal": 0,
+//           "type": getTypeTransaction(address, item.from),
+//         }
+//       )
+//     }
+//     return result;
+//   } catch (err) {
+//     console.log(err)
+//     return null;
+//   }
+// }
 
 function getTypeTransaction(address, fromAdress) {
   if (address == fromAdress) {
