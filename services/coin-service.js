@@ -133,10 +133,9 @@ let coinService = {
           return await getListTransactionsTRC20(address, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', size, fingerprint);
         case 'matic':
           return await getListTransactionsPolygon(address, page, size);
-        // case 'ltc':
-        //   return await getListTransactionByBlockIO(address, config.LTC_BLOCK_API_KEY, fingerprint, code);
-        // case 'doge':
-        //   return await getListTransactionByBlockIO(address, config.DOGE_BLOCK_API_KEY, fingerprint, code);
+        case 'ltc':
+        case 'doge':
+          return await getListTransactionByBlockCypher(address, code, size, page, fingerprint);
         default:
           break;
       }
@@ -269,7 +268,7 @@ async function getListTransactionsTRC20(address, contractAddress, size, fingerpr
   try {
     URL = `https://api.trongrid.io/v1/accounts/${address}/transactions/trc20?contract_address=${contractAddress}&limit=${size}&fingerprint=${fingerprint || ''}`;
     let response = await sendrequest({ uri: URL, method: 'GET' })
-    var listTransactions = response.data || [];
+    var listTransactions = response.data;
     if (!Array.isArray(listTransactions)) {
       return [];
     }
@@ -288,6 +287,7 @@ async function getListTransactionsTRC20(address, contractAddress, size, fingerpr
           "tokenDecimal": item.token_info.decimals,
           // "type": (item.type || getTypeTransaction(address, item.from)).toLowerCase(),
           "type": getTypeTransaction(address, item.from),
+          "fingerprint": response.meta.fingerprint || '',
         }
       )
     }
@@ -398,44 +398,87 @@ async function getListTransactionsPolygon(address, page, size) {
   }
 }
 
-// async function getListTransactionByBlockIO(address, key, before_tx, code) {
-//   try {
-//     URL = `https://block.io/api/v2/get_transactions/?api_key=${key}&type=sent&before_tx=${before_tx}&addresses=${address}`;
-//     let response = await sendrequest({ uri: URL, method: 'GET' })
-//     var listTransactions = response.data.txs;
-//     if (!Array.isArray(listTransactions)) {
-//       return [];
-//     }
-//     var result = [];
-//     for (var i in listTransactions) {
-//       const item = listTransactions[i];
-//       result.push(
-//         {
-//           "from": item.senders,
-//           "to": item.amounts_sent[0].recipient,
-//           "value": item.amounts_sent[0].amount,
-//           "fee": (parseFloat(item.total_amount_sent) - parseFloat(item.amounts_sent[0].amount)).toString(),
-//           "timeStamp": parseInt(item.time),
-//           "transaction_id": item.txid,
-//           "tokenName": code,
-//           "tokenSymbol": code,
-//           "tokenDecimal": 0,
-//           "type": getTypeTransaction(address, item.from),
-//         }
-//       )
-//     }
-//     return result;
-//   } catch (err) {
-//     console.log(err)
-//     return null;
-//   }
-// }
+async function getListTransactionByBlockCypher(address, code, limit, page, fingerprint) {
+  try {
+    if (fingerprint.toString().includes('false') || fingerprint == 'endSession') {
+      return [];
+    }
+    var before = '';
+    if (page > 1 && Array.isArray(fingerprint.toString().split('_'))) {
+      before = `&before=${fingerprint.toString().split('_')[1]}`;
+    }
+    URL = `https://api.blockcypher.com/v1/${code}/main/addrs/${address}/full?limit=${limit}${before}`;
+    let response = await sendrequest({ uri: URL, method: 'GET' });
+    console.log(URL);
+    var listTransactions = response.txs;
+    if (!Array.isArray(listTransactions)) {
+      return [];
+    }
+    var result = [];
+    for (var i in listTransactions) {
+      const item = listTransactions[i];
+      var from = '';
+      var to = '';
+      var value = 0;
+      for (var input of item.inputs) {
+        if (input.addresses) {
+          if (!from.includes(input.addresses)) {
+            from += `${input.addresses}, `;
+          }
+          if (input.addresses == address) {
+            value += input.value || input.output_value;
+          }
+        }
+      }
+      for (var output of item.outputs) {
+        if (output.addresses) {
+          if (!to.includes(output.addresses)) {
+            to += `${output.addresses}, `;
+          }
+          if (output.addresses == address) {
+            value -= output.value;
+          }
+        }
+      }
+      let type = getTypeTransaction(address, from);
+      strRegex = `${address}, `;
+      var regex = new RegExp(strRegex, "g");
+      result.push(
+        {
+          "from": type == 'transfer' ? address : (from.replace(regex, '') == '' ? '' : from.replace(regex, '').slice(0, -2)),
+          "to": type == 'deposit' ? address : (to.replace(regex, '') == '' ? '' : to.replace(regex, '').slice(0, -2)),
+          "value": Math.abs(value).toString(),
+          "fee": parseFloat(item.fees).toString(),
+          "timeStamp": Math.floor(Date.parse(item.received || item.confirmed) / 1000),
+          "transaction_id": item.hash,
+          "tokenName": getTokenNameByCode(code),
+          "tokenSymbol": code,
+          "tokenDecimal": 8,
+          "type": type,
+          "fingerprint": `${response.hasMore || 'false'}_${item.block_height}`,
+        }
+      )
+    }
+    return result;
+  } catch (err) {
+    console.log(err)
+    return null;
+  }
+}
 
-function getTypeTransaction(address, fromAdress) {
-  if (address == fromAdress) {
+function getTypeTransaction(address, fromAddress) {
+  if (fromAddress.toString().includes(address)) {
     return 'transfer'
   }
   return 'deposit'
+}
+
+function getTokenNameByCode(code) {
+  switch (code.toLowerCase()) {
+    case 'ltc': return 'Litecoin';
+    case 'doge': return 'Dogecoin';
+  }
+  return ''
 }
 
 async function sendrequest(option) {
