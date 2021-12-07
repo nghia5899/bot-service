@@ -1,6 +1,7 @@
 let mongoose = require("mongoose");
 
 let CoinSchema = new mongoose.Schema({
+  _id: {type: String, required:false, default: ''},
   code: {type: String, required:false, default: ''},
   price: {type: Number, required:false, default: 0},
   isWithdrawable: {type: Boolean, required: false, default: true},

@@ -39,8 +39,6 @@ let coinService = {
         listCoinData.forEach(element => {
           listCoin.push(element.code)
         })
-      } else {
-        listCoin = ['BTC', 'ETH', 'TRX', 'BNB', 'XRP', 'DOGE']
       }
       let response = await cloneDataModel.listSymbolsPrice(listCoin)
       if (response[1]) {
@@ -158,6 +156,7 @@ let coinService = {
 
 function CoinData(coin) {
   return Coin({
+    _id: coin.code,
     code: coin.code,
     price: coin.price,
   })
