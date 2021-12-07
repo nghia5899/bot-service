@@ -21,10 +21,6 @@ app.use(express.json())
 
 route(app);
 
-currencyService.initCoupleCurrency()
-
-coinService.initCoin()
-
 app.listen(port, function() {
     console.log('Node server running @ http://localhost:'+ port + '...')
 })

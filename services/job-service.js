@@ -3,7 +3,7 @@ const cloneHistoryService = require('./clone-history-service')
 const coinService = require('./coin-service')
 
 let jobAddHistoryMinute = new cronJob.CronJob({
-  cronTime: '*/5 * * * *', 
+  cronTime: '*/10 * * * *', 
   onTick: async function() {
     console.log(`History minute - ${getTime()}`)
     try {

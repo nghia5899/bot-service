@@ -53,24 +53,6 @@ let currencyService = {
     try {
       let listCoupleCurrency = await CoupleCurrency.find({}, { _id: 0, _v: 0 })
       if (!listCoupleCurrency.length) {
-        let listCoin = [
-          {
-            "currencyFrom": "BTC",
-            "currencyTo": "USDT"
-          },
-          {
-            "currencyFrom": "ETH",
-            "currencyTo": "USDT"
-          },
-          {
-            "currencyFrom": "TRX",
-            "currencyTo": "USDT"
-          },
-          {
-            "currencyFrom": "BNB",
-            "currencyTo": "USDT"
-          },
-        ]
         this.insertCoupleCurrency(listCoin)
       } else {
         cloneHistoryService.refreshAllHistory()
