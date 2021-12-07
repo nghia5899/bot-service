@@ -54,37 +54,66 @@ let jobController = {
     console.log('------------------------')
     console.log('| Start Job Add Minute |')
     console.log('------------------------')
-    jobAddHistoryMinute.start()
+    try {
+      jobAddHistoryMinute.start()
+    } catch (error) {
+      console.log(error)
+    }
   },
   startjobAddHistoryHour() {
     console.log('----------------------')
     console.log('| Start Job Add Hour |')
     console.log('----------------------')
-    jobAddHistoryHour.start()
+    try {
+      jobAddHistoryHour.start()
+    } catch (error) {
+      console.log(error)
+    }
+    
   },
   startJobGetSymbolsPrice() {
     console.log('-------------------------------')
     console.log('| Start Job Get Symbols Price |')
     console.log('-------------------------------')
-    jobGetSymbolsPrice.start()
+    try {
+      jobGetSymbolsPrice.start()
+    } catch (error) {
+      console.log(error)
+    }
+    
   },
   stopJobAddHistoryMinute() {
     console.log('-----------------------')
     console.log('| Stop Job Add Minute |')
     console.log('-----------------------')
-    jobAddHistoryMinute.stop()
+    try {
+      jobAddHistoryMinute.stop()
+    } catch (error) {
+      console.log(error)
+    }
+    
   },
   stopJobAddHistoryHour() {
     console.log('---------------------')
     console.log('| Stop Job Add Hour |')
     console.log('---------------------')
-    jobAddHistoryHour.stop()
+    try {
+      jobAddHistoryHour.stop()
+    } catch (error) {
+      console.log(error)
+    }
+    
   },
   stopJobGetSymbolsPrice() {
     console.log('-------------------------------')
     console.log('| Stop Job Get Symbols Price |')
     console.log('-------------------------------')
-    jobGetSymbolsPrice.stop()
+    try {
+      jobGetSymbolsPrice.stop()
+    } catch (error) {
+      console.log(error)
+    }
+    
   }
 }
 
