@@ -13,11 +13,5 @@ let CoinSchema = new mongoose.Schema({
 }, {timestamps: true})
 
 var Coin = mongoose.model("Coin", CoinSchema)
-Coin.collection.createIndex({
-  code: 1
-},
-  {unique: true}
-)
-
 
 module.exports = { Coin }
