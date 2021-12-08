@@ -116,6 +116,7 @@ let coinService = {
   },
 
   async getListTransactions(address, code, contractAddress, network, page, size, fingerprint) {
+    console.log(code)
     try {
       switch (code.toLowerCase()) {
         case 'trx':
@@ -135,6 +136,8 @@ let coinService = {
         case 'ltc':
         case 'doge':
           return await getListTransactionByBlockCypher(address, code, size, page, fingerprint);
+        case 'sol':
+          return await getSolTransactions(address, page, size);
         default:
           break;
       }
@@ -463,6 +466,39 @@ async function getListTransactionByBlockCypher(address, code, limit, page, finge
   } catch (err) {
     console.log(err)
     return null;
+  }
+}
+
+async function getSolTransactions(address, page, size) {
+  try {
+    URL = `https://api.solscan.io/account/soltransfer/txs?address=${address}&offset=${size * (page - 1)}&limit=${size}`;
+    let response = await sendrequest({ uri: URL, method: 'GET' })
+    var listTransactions = response.data.tx.transactions;
+    if (!Array.isArray(listTransactions)) {
+      return [];
+    }
+    var result = [];
+    for (var i in listTransactions) {
+      const item = listTransactions[i];
+      result.push(
+        {
+          "from": item.src,
+          "to": item.dst,
+          "value": item.lamport.toString(),
+          "fee": item.fee.toString(),
+          "timeStamp": parseInt(item.blockTime),
+          "transaction_id": item._id,
+          "tokenName": 'Solana',
+          "tokenSymbol": 'Sol',
+          "tokenDecimal": 9,
+          "type": getTypeTransaction(address, item.src),
+        }
+      )
+    }
+    return result;
+  } catch (err) {
+    console.log(err)
+    return [];
   }
 }
 
