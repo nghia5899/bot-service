@@ -34,7 +34,7 @@ let coinService = {
   async initCoin() {
     try {
       let listCoinData = await Coin.find({}, { _id: 0, _v: 0 })
-      let listCoin = [];
+      let listCoin = []
       if (listCoinData.length) {
         listCoinData.forEach(element => {
           listCoin.push(element.code)
@@ -116,44 +116,45 @@ let coinService = {
   },
 
   async getListTransactions(address, code, contractAddress, network, page, size, fingerprint) {
-    console.log(code)
     try {
       switch (code.toLowerCase()) {
         case 'trx':
-          return await getListTransactionsTRX(address, size, page);
+          return await getListTransactionsTRX(address, size, page)
         case 'btc':
-          return await getListTransactionsBTC(address, page, size);
+          return await getListTransactionsBTC(address, page, size)
         case 'eth':
-          return await getListTransactionsETH(address, page, size);
+          return await getListTransactionsETH(address, page, size)
         case 'bsc':
-          return await getListTransactionsBSC(address, page, size);
+          return await getListTransactionsBSC(address, page, size)
         case 'usdt_erc20':
-          return await getListTransactionsEthereum(address, '0xdac17f958d2ee523a2206206994597c13d831ec7', 'ethereum', page, size);
+          return await getListTransactionsEthereum(address, '0xdac17f958d2ee523a2206206994597c13d831ec7', 'ethereum', page, size)
         case 'usdt_trc20':
-          return await getListTransactionsTRC20(address, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', size, fingerprint);
+          return await getListTransactionsTRC20(address, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', size, fingerprint)
         case 'matic':
-          return await getListTransactionsPolygon(address, page, size);
+          return await getListTransactionsPolygon(address, page, size)
         case 'ltc':
         case 'doge':
-          return await getListTransactionByBlockCypher(address, code, size, page, fingerprint);
+          return await getListTransactionByBlockCypher(address, code, size, page, fingerprint)
         case 'sol':
-          return await getSolTransactions(address, page, size);
+          return await getSolTransactions(address, page, size)
         default:
-          break;
+          break
       }
       switch (network) {
         case 'ethereum':
         case 'binance-smart-chain':
-          return await getListTransactionsEthereum(address, contractAddress, network, page, size);
+          return await getListTransactionsEthereum(address, contractAddress, network, page, size)
         case 'tron':
-          return await getListTransactionsTRC20(address, contractAddress, size, fingerprint);
+          return await getListTransactionsTRC20(address, contractAddress, size, fingerprint)
+        case 'SOL':
+          return await getSolTokenTransaction(address, contractAddress, page, size)
         default:
-          break;
+          break
       }
-      return null;
+      return null
     } catch (err) {
       console.log(err)
-      return null;
+      return null
     }
   },
 }
@@ -168,18 +169,18 @@ function CoinData(coin) {
 
 async function getListTransactionsEthereum(address, contractAddress, network, page, size) {
   try {
-    URL = `https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.ETHER_SCAN_API_KEY}`;
+    URL = `https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.ETHER_SCAN_API_KEY}`
     if (network == 'binance-smart-chain') {
-      URL = `https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.BSC_SCAN_API_KEY}`;
+      URL = `https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=${contractAddress}&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.BSC_SCAN_API_KEY}`
     }
     let response = await sendrequest({ uri: URL, method: 'GET' })
-    var listTransactions = response.result;
+    var listTransactions = response.result
     if (!Array.isArray(listTransactions)) {
-      return [];
+      return []
     }
-    var result = [];
+    var result = []
     for (var i in listTransactions) {
-      const item = listTransactions[i];
+      const item = listTransactions[i]
       result.push(
         {
           "from": item.from,
@@ -194,24 +195,24 @@ async function getListTransactionsEthereum(address, contractAddress, network, pa
         }
       )
     }
-    return result;
+    return result
   } catch (err) {
     console.log(err)
-    return null;
+    return null
   }
 }
 
 async function getListTransactionsETH(address, page, size) {
   try {
-    URL = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.ETHER_SCAN_API_KEY}`;
+    URL = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.ETHER_SCAN_API_KEY}`
     let response = await sendrequest({ uri: URL, method: 'GET' })
-    var listTransactions = response.result;
+    var listTransactions = response.result
     if (!Array.isArray(listTransactions)) {
-      return [];
+      return []
     }
-    var result = [];
+    var result = []
     for (var i in listTransactions) {
-      const item = listTransactions[i];
+      const item = listTransactions[i]
       result.push(
         {
           "from": item.from,
@@ -227,24 +228,24 @@ async function getListTransactionsETH(address, page, size) {
         }
       )
     }
-    return result;
+    return result
   } catch (err) {
     console.log(err)
-    return null;
+    return null
   }
 }
 
 async function getListTransactionsBSC(address, page, size) {
   try {
-    URL = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.BSC_SCAN_API_KEY}`;
+    URL = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.BSC_SCAN_API_KEY}`
     let response = await sendrequest({ uri: URL, method: 'GET' })
-    var listTransactions = response.result;
+    var listTransactions = response.result
     if (!Array.isArray(listTransactions)) {
-      return [];
+      return []
     }
-    var result = [];
+    var result = []
     for (var i in listTransactions) {
-      const item = listTransactions[i];
+      const item = listTransactions[i]
       result.push(
         {
           "from": item.from,
@@ -260,24 +261,24 @@ async function getListTransactionsBSC(address, page, size) {
         }
       )
     }
-    return result;
+    return result
   } catch (err) {
     console.log(err)
-    return null;
+    return null
   }
 }
 
 async function getListTransactionsTRC20(address, contractAddress, size, fingerprint) {
   try {
-    URL = `https://api.trongrid.io/v1/accounts/${address}/transactions/trc20?contract_address=${contractAddress}&limit=${size}&fingerprint=${fingerprint || ''}`;
+    URL = `https://api.trongrid.io/v1/accounts/${address}/transactions/trc20?contract_address=${contractAddress}&limit=${size}&fingerprint=${fingerprint || ''}`
     let response = await sendrequest({ uri: URL, method: 'GET' })
-    var listTransactions = response.data;
+    var listTransactions = response.data
     if (!Array.isArray(listTransactions)) {
-      return [];
+      return []
     }
-    var result = [];
+    var result = []
     for (var i in listTransactions) {
-      const item = listTransactions[i];
+      const item = listTransactions[i]
       result.push(
         {
           "from": item.from,
@@ -294,24 +295,24 @@ async function getListTransactionsTRC20(address, contractAddress, size, fingerpr
         }
       )
     }
-    return result;
+    return result
   } catch (err) {
     console.log(err)
-    return null;
+    return null
   }
 }
 
 async function getListTransactionsTRX(address, size, page) {
   try {
-    URL = `https://apilist.tronscan.org/api/transaction?sort=-timestamp&limit=${size}&start=${size * (page - 1)}&address=${address}`;
-    let response = await sendrequest({ uri: URL, method: 'GET' });
+    URL = `https://apilist.tronscan.org/api/transaction?sort=-timestamp&limit=${size}&start=${size * (page - 1)}&address=${address}`
+    let response = await sendrequest({ uri: URL, method: 'GET' })
     if (!Array.isArray(response.data)) {
-      return [];
+      return []
     }
-    var listTransactions = response.data || [];
-    var result = [];
+    var listTransactions = response.data || []
+    var result = []
     for (var i in listTransactions) {
-      const item = listTransactions[i];
+      const item = listTransactions[i]
       result.push(
         {
           "from": item.ownerAddress,
@@ -328,24 +329,24 @@ async function getListTransactionsTRX(address, size, page) {
         }
       )
     }
-    return result;
+    return result
   } catch (err) {
     console.log(err)
-    return null;
+    return null
   }
 }
 
 async function getListTransactionsBTC(address, page, size) {
   try {
-    URL = `https://blockchain.info/rawaddr/${address}?limit=${size}&offset=${size * (page - 1)}`;
+    URL = `https://blockchain.info/rawaddr/${address}?limit=${size}&offset=${size * (page - 1)}`
     let response = await sendrequest({ uri: URL, method: 'GET' })
     if (!Array.isArray(response.txs)) {
-      return [];
+      return []
     }
-    var listTransactions = response.txs || [];
-    var result = [];
+    var listTransactions = response.txs || []
+    var result = []
     for (var i in listTransactions) {
-      const item = listTransactions[i];
+      const item = listTransactions[i]
       result.push(
         {
           "from": item.inputs[0].prev_out.addr,
@@ -361,24 +362,24 @@ async function getListTransactionsBTC(address, page, size) {
         }
       )
     }
-    return result;
+    return result
   } catch (err) {
     console.log(err)
-    return null;
+    return null
   }
 }
 
 async function getListTransactionsPolygon(address, page, size) {
   try {
-    URL = `https://api.polygonscan.com/api?module=account&action=txlist&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.POLYGON_SCAN_API_KEY}`;
+    URL = `https://api.polygonscan.com/api?module=account&action=txlist&address=${address}&page=${page}&offset=${size}&sort=desc&apikey=${config.POLYGON_SCAN_API_KEY}`
     let response = await sendrequest({ uri: URL, method: 'GET' })
-    var listTransactions = response.result;
+    var listTransactions = response.result
     if (!Array.isArray(listTransactions)) {
-      return [];
+      return []
     }
-    var result = [];
+    var result = []
     for (var i in listTransactions) {
-      const item = listTransactions[i];
+      const item = listTransactions[i]
       result.push(
         {
           "from": item.from,
@@ -394,58 +395,58 @@ async function getListTransactionsPolygon(address, page, size) {
         }
       )
     }
-    return result;
+    return result
   } catch (err) {
     console.log(err)
-    return null;
+    return null
   }
 }
 
 async function getListTransactionByBlockCypher(address, code, limit, page, fingerprint) {
   try {
     if (fingerprint.toString().includes('false') || fingerprint == 'endSession') {
-      return [];
+      return []
     }
-    var before = '';
+    var before = ''
     if (page > 1 && Array.isArray(fingerprint.toString().split('_'))) {
-      before = `&before=${fingerprint.toString().split('_')[1]}`;
+      before = `&before=${fingerprint.toString().split('_')[1]}`
     }
-    URL = `https://api.blockcypher.com/v1/${code}/main/addrs/${address}/full?limit=${limit}${before}`;
-    let response = await sendrequest({ uri: URL, method: 'GET' });
-    console.log(URL);
-    var listTransactions = response.txs;
+    URL = `https://api.blockcypher.com/v1/${code}/main/addrs/${address}/full?limit=${limit}${before}`
+    let response = await sendrequest({ uri: URL, method: 'GET' })
+    console.log(URL)
+    var listTransactions = response.txs
     if (!Array.isArray(listTransactions)) {
-      return [];
+      return []
     }
-    var result = [];
+    var result = []
     for (var i in listTransactions) {
-      const item = listTransactions[i];
-      var from = '';
-      var to = '';
-      var value = 0;
+      const item = listTransactions[i]
+      var from = ''
+      var to = ''
+      var value = 0
       for (var input of item.inputs) {
         if (input.addresses) {
           if (!from.includes(input.addresses)) {
-            from += `${input.addresses}, `;
+            from += `${input.addresses}, `
           }
           if (input.addresses == address) {
-            value += input.value || input.output_value;
+            value += input.value || input.output_value
           }
         }
       }
       for (var output of item.outputs) {
         if (output.addresses) {
           if (!to.includes(output.addresses)) {
-            to += `${output.addresses}, `;
+            to += `${output.addresses}, `
           }
           if (output.addresses == address) {
-            value -= output.value;
+            value -= output.value
           }
         }
       }
-      let type = getTypeTransaction(address, from);
-      strRegex = `${address}, `;
-      var regex = new RegExp(strRegex, "g");
+      let type = getTypeTransaction(address, from)
+      strRegex = `${address}, `
+      var regex = new RegExp(strRegex, "g")
       result.push(
         {
           "from": type == 'transfer' ? address : (from.replace(regex, '') == '' ? '' : from.replace(regex, '').slice(0, -2)),
@@ -462,24 +463,56 @@ async function getListTransactionByBlockCypher(address, code, limit, page, finge
         }
       )
     }
-    return result;
+    return result
   } catch (err) {
     console.log(err)
-    return null;
+    return null
+  }
+}
+
+async function getSolTokenTransaction(address, contractAddress, page, size) {
+  try {
+    URL = `https://public-api.solscan.io/account/splTransfers?account=${address}`
+    let response = await sendrequest({ uri: URL, method: 'GET' })
+    var listTransactions = response.data
+    if (!Array.isArray(listTransactions)) {
+      return []
+    }
+    var result = []
+    for (var i in listTransactions) {
+      const item = listTransactions[i]
+      result.push(
+        {
+          "from": item.owner,
+          "to": item.tokenAddress,
+          "value": item.changeAmount.toString(),
+          "fee": item.fee.toString(),
+          "timeStamp": parseInt(item.blockTime),
+          "transaction_id": item._id,
+          "tokenName": item.symbol,
+          "tokenSymbol": item.symbol,
+          "tokenDecimal": item.decimals,
+          "type": item.changeType === 'inc' ? 'deposit' : 'transfer',
+        }
+      )
+    }
+    return result
+  } catch (e) {
+    return []
   }
 }
 
 async function getSolTransactions(address, page, size) {
   try {
-    URL = `https://api.solscan.io/account/soltransfer/txs?address=${address}&offset=${size * (page - 1)}&limit=${size}`;
+    URL = `https://api.solscan.io/account/soltransfer/txs?address=${address}&offset=${size * (page - 1)}&limit=${size}`
     let response = await sendrequest({ uri: URL, method: 'GET' })
-    var listTransactions = response.data.tx.transactions;
+    var listTransactions = response.data.tx.transactions
     if (!Array.isArray(listTransactions)) {
-      return [];
+      return []
     }
-    var result = [];
+    var result = []
     for (var i in listTransactions) {
-      const item = listTransactions[i];
+      const item = listTransactions[i]
       result.push(
         {
           "from": item.src,
@@ -495,10 +528,10 @@ async function getSolTransactions(address, page, size) {
         }
       )
     }
-    return result;
+    return result
   } catch (err) {
     console.log(err)
-    return [];
+    return []
   }
 }
 
@@ -511,8 +544,8 @@ function getTypeTransaction(address, fromAddress) {
 
 function getTokenNameByCode(code) {
   switch (code.toLowerCase()) {
-    case 'ltc': return 'Litecoin';
-    case 'doge': return 'Dogecoin';
+    case 'ltc': return 'Litecoin'
+    case 'doge': return 'Dogecoin'
   }
   return ''
 }
