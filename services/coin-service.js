@@ -137,6 +137,8 @@ let coinService = {
           return await getListTransactionByBlockCypher(address, code, size, page, fingerprint)
         case 'sol':
           return await getSolTransactions(address, page, size)
+        case 'fil':
+          return await getFilTransactions(address, page, size)
         default:
           break
       }
@@ -534,6 +536,42 @@ async function getSolTransactions(address, page, size) {
     return []
   }
 }
+
+async function getFilTransactions(address, page, size) {
+  try {
+    URL = `https://filfox.info/api/v1/address/${address}/messages?pageSize=${size}&page=${page -1}`
+    console.log(URL)
+    let response = await sendrequest({ uri: URL, method: 'GET' })
+    var listTransactions = response.messages
+    if (!Array.isArray(listTransactions)) {
+      return []
+    }
+    var result = []
+    for (var i in listTransactions) {
+      const item = listTransactions[i]
+      result.push(
+        {
+          "from": item.from,
+          "to": item.to,
+          "value": item.value,
+          "fee": item.fee || '',
+          "timeStamp": item.timestamp,
+          "transaction_id": item.cid,
+          "tokenName": 'Filecoin',
+          "tokenSymbol": 'FIL',
+          "tokenDecimal": 18,
+          "type": getTypeTransaction(address, item.from) + (item.receipt.exitCode ? '_error' : ''),
+        }
+      )
+    }
+    return result
+  } catch (err) {
+    console.log(err)
+    return []
+  }
+}
+
+https://filfox.info/api/v1/address/f17bsgb6brlnzyezcaw55f4sctw4cm6xlfiwebrci/messages?pageSize=20&page=0
 
 function getTypeTransaction(address, fromAddress) {
   if (fromAddress.toString().includes(address)) {
