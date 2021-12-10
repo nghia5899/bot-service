@@ -11,12 +11,12 @@ let CoupleCurrencySchema = new mongoose.Schema({
 });
 
 var CoupleCurrency = mongoose.model("CoupleCurrency", CoupleCurrencySchema)
-CoupleCurrency.collection.createIndex({
-  currencyfrom: 1,
-  currencyto: 1,
-},
-  {unique: true}
-)
+// CoupleCurrency.collection.createIndex({
+//   currencyfrom: 1,
+//   currencyto: 1,
+// },
+//   {unique: true}
+// )
 
 
 module.exports = { coupleCurrencyModel, CoupleCurrency }

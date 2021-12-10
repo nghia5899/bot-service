@@ -10,7 +10,7 @@ mongoose
     useNewUrlParser: true,  
     useUnifiedTopology: true,  
     useFindAndModify: false,
-    useCreateIndex: true,
+    // useCreateIndex: true,
   })
   .catch((err) => {
     console.log(err.message)

@@ -6,10 +6,10 @@ let UserSchema = new mongoose.Schema({
 }, {timestamps: true})
 
 var User = mongoose.model("User", UserSchema)
-User.collection.createIndex({
-  name: 1
-},
-  {unique: true}
-)
+// User.collection.createIndex({
+//   name: 1
+// },
+//   {unique: true}
+// )
 
 module.exports = { User }

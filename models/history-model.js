@@ -22,13 +22,13 @@ var HistorySchema = new mongoose.Schema({
 
 var History = mongoose.model("History", HistorySchema)
 
-History.collection.createIndex({
-  time: 1,
-  currencyfrom: 1,
-  currencyto: 1,
-  isminute: 1,
-},
-{unique: true}
-)
+// History.collection.createIndex({
+//   time: 1,
+//   currencyfrom: 1,
+//   currencyto: 1,
+//   isminute: 1,
+// },
+// {unique: true}
+// )
 
 module.exports = { historyModel, History}
