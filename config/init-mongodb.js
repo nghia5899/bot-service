@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const server = 'mongodb://52.221.64.122:27017'
+const server = 'mongodb://127.0.0.1:27017'
 const database =  process.env.MONGODB_DATABASE || 'crypto'
 const jobService = require('../services/job-service')
 const cloneHistoryService = require('../services/clone-history-service')
