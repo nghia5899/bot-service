@@ -130,6 +130,8 @@ let coinService = {
           return await getListTransactionsEthereum(address, '0xdac17f958d2ee523a2206206994597c13d831ec7', 'ethereum', page, size)
         case 'usdt_trc20':
           return await getListTransactionsTRC20(address, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', size, fingerprint)
+        case 'usdt_sol':
+          return await getSolTokenTransaction(address, 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB')
         case 'matic':
           return await getListTransactionsPolygon(address, page, size)
         case 'ltc':
