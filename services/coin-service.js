@@ -483,20 +483,22 @@ async function getSolTokenTransaction(address, contractAddress, page, size) {
     var result = []
     for (var i in listTransactions) {
       const item = listTransactions[i]
-      result.push(
-        {
-          "from": item.owner,
-          "to": item.tokenAddress,
-          "value": item.changeAmount.toString(),
-          "fee": item.fee.toString(),
-          "timeStamp": parseInt(item.blockTime),
-          "transaction_id": item._id,
-          "tokenName": item.symbol,
-          "tokenSymbol": item.symbol,
-          "tokenDecimal": item.decimals,
-          "type": item.changeType === 'inc' ? 'deposit' : 'transfer',
-        }
-      )
+      if (item.tokenAddress === contractAddress) {
+        result.push(
+          {
+            "from": item.owner,
+            "to": item.tokenAddress,
+            "value": item.changeAmount.toString(),
+            "fee": item.fee.toString(),
+            "timeStamp": parseInt(item.blockTime),
+            "transaction_id": item._id,
+            "tokenName": item.symbol,
+            "tokenSymbol": item.symbol,
+            "tokenDecimal": item.decimals,
+            "type": item.changeType === 'inc' ? 'deposit' : 'transfer',
+          }
+        )
+      }
     }
     return result
   } catch (e) {
