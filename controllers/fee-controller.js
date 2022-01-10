@@ -1,3 +1,4 @@
+const { default: RangeSet } = require('ripple-lib/dist/npm/common/rangeset')
 const {ResponseData} = require('../helpers/response-data')
 const feeService = require('../services/fee-service')
 const util = require('../utils/util')
@@ -22,7 +23,7 @@ module.exports = {
     let code = req.query.networkType || req.query.code
     code = code.toUpperCase()
 	  feeService.getFee(code.toUpperCase()).then(async rs => {
-      const response = rs
+      const response = rs || {}
       switch (code) {
         case 'TRC20':
           response.minimunBalance = util.generateMinimumBalance(req.query.precision || 1)

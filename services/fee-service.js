@@ -33,6 +33,10 @@ module.exports = {
         url = 'https://rpc-mainnet.maticvigil.com'
         defaultFee = 1000000001
         break
+      case 'AVAX_CCHAIN':
+        url = 'https://api.avax.network/ext/bc/C/rpc'
+        defaultFee = 5000000000
+        break
       default:
         break
     }
@@ -45,6 +49,7 @@ module.exports = {
       }).then(rs => {
         resolve(parseInt(rs.data.result, 16) || defaultFee)
       }).catch(rs => {
+        console.log(rs)
         reject(defaultFee)
       })
     })
