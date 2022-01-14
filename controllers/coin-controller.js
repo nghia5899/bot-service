@@ -13,6 +13,16 @@ class CoinController {
     }
   }
 
+  async listCoinBalance(req, res) {
+    try {
+      let response = await coinService.getBalance()
+      return res.json(new ResponseData(true, "", response.data).toJson())
+    } catch (err) {
+      console.log(err)
+      return res.json(new ResponseData(false, err).toJson())
+    }
+  }
+
   initCoin(req, res) {
     try {
       coinService.initCoin()

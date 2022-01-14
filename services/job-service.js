@@ -36,7 +36,7 @@ let jobGetSymbolsPrice = new cronJob.CronJob({
   onTick: function() {
     console.log(`Price - ${getTime()}`)
     try {
-      coinService.initCoin()
+      coinService.getMarketData()
     } catch (e) {
       console.log(e)
     }
