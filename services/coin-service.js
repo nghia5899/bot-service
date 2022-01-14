@@ -32,38 +32,6 @@ let coinService = {
     }
   },
 
-  async initCoin() {
-    try {
-      let listCoinData = await Coin.find({}, { _id: 0, _v: 0 })
-      let listCoin = []
-      if (listCoinData.length) {
-        listCoinData.forEach(element => {
-          listCoin.push(element.code)
-        })
-      }
-      let response = await cloneDataModel.listSymbolsPrice(listCoin)
-      if (response[1]) {
-        if (response[1].Response) return
-        let listSymbolsPrice = Object.entries(response[1])
-        new Map(listSymbolsPrice).forEach((value, key) => {
-          let coin = new CoinData({ id: key, code: key, price: value.USD })
-          coin.save((err) => {
-            if (err) {
-              let filter = {
-                code: key
-              }
-              let update = { $set: { price: value.USD } }
-              Coin.collection.findOneAndUpdate(filter, update).catch((err) => { })
-            }
-          })
-        })
-      }
-    } catch (e) {
-      console.log(e)
-      throw e
-    }
-  },
-
   async getMarketData() {
     try {
       let listCoinData = await Coin.find({ isGetPrice: true }, { _id: 0, _v: 0 })
@@ -101,7 +69,7 @@ let coinService = {
     try {
       if (listCoin.length) {
         listCoin.forEach(element => {
-          let coin = new CoinData({id: element,  code: element, price: 0 })
+          let coin = new CoinData({code: element, price: 0 })
           coin.save((err) => { })
         })
       }

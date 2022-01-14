@@ -23,16 +23,6 @@ class CoinController {
     }
   }
 
-  initCoin(req, res) {
-    try {
-      coinService.initCoin()
-      return res.json(new ResponseDataWithPagination(true, "").toJson())
-    } catch (err) {
-      console.log(err)
-      return res.json(new ResponseData(false, err).toJson())
-    }
-  }
-
   addCoin(req, res) {
     try {
       let listCoin = req.body.listCoin
