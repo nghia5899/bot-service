@@ -3,6 +3,7 @@ const cloneDataModel = require('./clone-data-service')
 const request = require('request')
 const { getListTransactions } = require('../controllers/coin-controller')
 const config = require('../config/config')
+const { Market} = require('../models/market')
 
 let coinService = {
 
@@ -20,9 +21,9 @@ let coinService = {
   async getBalance() {
     try {
       return new Promise((resolve, reject) => {
-        Coin.find({}, { _id: 0, __v: 0 }, (err, data) => {
+        Market.find({}, { _id: 0, __v: 0 ,createdAt: 0, updatedAt: 0,}, (err, data) => {
           if (err) return reject(err)
-          return resolve(data)
+          return resolve({ data: data })
         })
       })
     } catch (e) {
@@ -45,8 +46,41 @@ let coinService = {
         if (response[1].Response) return
         let listSymbolsPrice = Object.entries(response[1])
         new Map(listSymbolsPrice).forEach((value, key) => {
-          let coin = new CoinData({ code: key, price: value.USD })
+          let coin = new CoinData({ id: key, code: key, price: value.USD })
           coin.save((err) => {
+            if (err) {
+              let filter = {
+                code: key
+              }
+              let update = { $set: { price: value.USD } }
+              Coin.collection.findOneAndUpdate(filter, update).catch((err) => { })
+            }
+          })
+        })
+      }
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
+  },
+
+  async getMarketData() {
+    try {
+      let listCoinData = await Coin.find({ isGetPrice: true }, { _id: 0, _v: 0 })
+      console.log(listCoinData)
+      let listCoin = []
+      if (listCoinData.length) {
+        listCoinData.forEach(element => {
+          listCoin.push(element.code)
+        })
+      }
+      let response = await cloneDataModel.listSymbolsPrice(listCoin)
+      if (response[1]) {
+        if (response[1].Response) return
+        let listSymbolsPrice = Object.entries(response[1])
+        new Map(listSymbolsPrice).forEach((value, key) => {
+          let marketData = new MarketData({ id: key, code: key, price: value.USD })
+          marketData.save((err) => {
             if (err) {
               let filter = {
                 code: key
@@ -67,10 +101,9 @@ let coinService = {
     try {
       if (listCoin.length) {
         listCoin.forEach(element => {
-          let coin = new CoinData({ code: element, price: 0 })
+          let coin = new CoinData({id: element,  code: element, price: 0 })
           coin.save((err) => { })
         })
-        this.initCoin()
       }
     } catch (e) {
       console.log(e)
@@ -87,6 +120,7 @@ let coinService = {
       }
     } catch (e) {
       console.log(e)
+      throw e
     }
   },
 
@@ -168,6 +202,14 @@ function CoinData(coin) {
     _id: coin.code,
     code: coin.code,
     price: coin.price,
+  })
+}
+
+function MarketData(market) {
+  return Market({
+    _id: market.code,
+    code: market.code,
+    price: market.price,
   })
 }
 
