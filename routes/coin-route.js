@@ -11,7 +11,7 @@ router.post('/', authController.isAuth, coinController.addCoin)
 
 router.delete('/', authController.isAuth, coinController.deleteCoin)
 
-router.get('/balance', coinController.listCoinBalance)
+router.get('/marketdata', coinController.listCoinBalance)
 
 router.get('/fee', coinController.feeWithdraw)
 

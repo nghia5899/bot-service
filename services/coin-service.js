@@ -35,7 +35,6 @@ let coinService = {
   async getMarketData() {
     try {
       let listCoinData = await Coin.find({ isGetPrice: true }, { _id: 0, _v: 0 })
-      console.log(listCoinData)
       let listCoin = []
       if (listCoinData.length) {
         listCoinData.forEach(element => {
