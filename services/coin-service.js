@@ -557,6 +557,7 @@ async function getSolTransactions(address, page, size) {
 }
 
 async function getVTHOTransactions(address, page = 1, size = 10) {
+  const originAddress = address
   address = util.strip0x(address)
   address = util.strPadding(address, 64)
   address = '0x' + address
@@ -564,7 +565,7 @@ async function getVTHOTransactions(address, page = 1, size = 10) {
     const body = {
       'options': {
         'offset': size * (page - 1),
-        'limit': size
+        'limit': Number(size)
       },
       'criteriaSet': [
         {
@@ -580,7 +581,7 @@ async function getVTHOTransactions(address, page = 1, size = 10) {
       ],
       'order': 'desc'
     }
-    const response = await httpclient.post('https://explore-testnet.veblocks.net/logs/event', body)
+    const response = await httpclient.post('https://explore-mainnet.veblocks.net/logs/event', body)
     const result = []
     for (var i in response.data) {
       const item = response.data[i]
@@ -589,20 +590,21 @@ async function getVTHOTransactions(address, page = 1, size = 10) {
           {
             'from': item.meta.txOrigin,
             'to': '0x' + util.strip0x(item.topics[2]).replace(/^0+/, ''),
-            'value': util.dividedBy(Number(item.data), util.generateDecimalMultiplier(18)),
-            'fee': item.fee || '',
+            'value': util.dividedBy(Number(item.data), util.generateDecimalMultiplier(18)).toString(),
+            'fee': item.fee ? item.fee.toString() : '',
             'timeStamp': item.meta.blockTimestamp,
             'transaction_id': item.meta.txID,
             'tokenName': 'VeThor',
             'tokenSymbol': 'VTHO',
-            'tokenDecimal': 18,
-            'type': getTypeTransaction(address, item.meta.txOrigin),
+            'tokenDecimal': 0,
+            'type': getTypeTransaction(originAddress, item.meta.txOrigin),
           }
         )
       }
     }
     return result
   } catch (error) {
+    console.log(error)
     return []
   }
 }
@@ -612,7 +614,7 @@ async function getVetTransactions(address, page = 1, size = 10) {
     const body = {
       'options': {
         'offset': size * (page - 1),
-        'limit': size
+        'limit': Number(size)
       },
       'criteriaSet': [
         {
@@ -624,23 +626,22 @@ async function getVetTransactions(address, page = 1, size = 10) {
       ],
       'order': 'desc'
     }
-    const response = await httpclient.post('https://explore-testnet.veblocks.net/logs/transfer', body)
+    const response = await httpclient.post('https://explore-mainnet.veblocks.net/logs/transfer', body)
     const result = []
     for (var i in response.data) {
       const item = response.data[i]
-      console.log(Number(item.amount))
       if (new BigNumber(Number(item.amount)).comparedTo('1000000000000000000') != -1) {
         result.push(
           {
             'from': item.sender,
             'to': item.recipient,
-            'value': util.dividedBy(Number(item.amount), util.generateDecimalMultiplier(18)),
-            'fee': item.fee || '',
+            'value': util.dividedBy(Number(item.amount), util.generateDecimalMultiplier(18)).toString(),
+            'fee': item.fee ? item.fee.toString() : '',
             'timeStamp': item.meta.blockTimestamp,
             'transaction_id': item.meta.txID,
             'tokenName': 'Vechain',
             'tokenSymbol': 'VET',
-            'tokenDecimal': 18,
+            'tokenDecimal': 0,
             'type': getTypeTransaction(address, item.sender),
           }
         )
@@ -648,6 +649,7 @@ async function getVetTransactions(address, page = 1, size = 10) {
     }
     return result
   } catch (error) {
+    console.log(error)
     return []
   }
 }
