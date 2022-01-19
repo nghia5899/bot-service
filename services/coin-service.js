@@ -1,9 +1,11 @@
 const { Coin } = require('../models/coin')
 const cloneDataModel = require('./clone-data-service')
 const request = require('request')
-const { getListTransactions } = require('../controllers/coin-controller')
 const config = require('../config/config')
 const { Market} = require('../models/market')
+const httpclient = require('../http/http-client')
+const util = require('../utils/util')
+const BigNumber = require('bignumber.js')
 
 let coinService = {
 
@@ -142,6 +144,10 @@ let coinService = {
           return await getSolTransactions(address, page, size)
         case 'fil':
           return await getFilTransactions(address, page, size)
+        case 'vet':
+          return await getVetTransactions(address, page, size)
+        case 'vtho':
+          return await getVTHOTransactions(address, page, size)
         default:
           break
       }
@@ -196,15 +202,15 @@ async function getListTransactionsEthereum(address, contractAddress, network, pa
       const item = listTransactions[i]
       result.push(
         {
-          "from": item.from,
-          "to": item.to,
-          "value": item.value,
-          "timeStamp": parseInt(item.timeStamp),
-          "transaction_id": item.hash,
-          "tokenName": item.tokenName,
-          "tokenSymbol": item.tokenSymbol,
-          "tokenDecimal": parseInt(item.tokenDecimal),
-          "type": getTypeTransaction(address, item.from),
+          'from': item.from,
+          'to': item.to,
+          'value': item.value,
+          'timeStamp': parseInt(item.timeStamp),
+          'transaction_id': item.hash,
+          'tokenName': item.tokenName,
+          'tokenSymbol': item.tokenSymbol,
+          'tokenDecimal': parseInt(item.tokenDecimal),
+          'type': getTypeTransaction(address, item.from),
         }
       )
     }
@@ -228,16 +234,16 @@ async function getListTransactionsETH(address, page, size) {
       const item = listTransactions[i]
       result.push(
         {
-          "from": item.from,
-          "to": item.to,
-          "value": item.value,
-          "fee": item.gasUsed,
-          "timeStamp": parseInt(item.timeStamp),
-          "transaction_id": item.hash,
-          "tokenName": 'Ethereum',
-          "tokenSymbol": 'eth',
-          "tokenDecimal": 18,
-          "type": getTypeTransaction(address, item.from),
+          'from': item.from,
+          'to': item.to,
+          'value': item.value,
+          'fee': item.gasUsed,
+          'timeStamp': parseInt(item.timeStamp),
+          'transaction_id': item.hash,
+          'tokenName': 'Ethereum',
+          'tokenSymbol': 'eth',
+          'tokenDecimal': 18,
+          'type': getTypeTransaction(address, item.from),
         }
       )
     }
@@ -261,16 +267,16 @@ async function getListTransactionsBSC(address, page, size) {
       const item = listTransactions[i]
       result.push(
         {
-          "from": item.from,
-          "to": item.to,
-          "value": item.value,
-          "fee": item.gasUsed,
-          "timeStamp": parseInt(item.timeStamp),
-          "transaction_id": item.hash,
-          "tokenName": 'Ethereum',
-          "tokenSymbol": 'eth',
-          "tokenDecimal": 18,
-          "type": getTypeTransaction(address, item.from),
+          'from': item.from,
+          'to': item.to,
+          'value': item.value,
+          'fee': item.gasUsed,
+          'timeStamp': parseInt(item.timeStamp),
+          'transaction_id': item.hash,
+          'tokenName': 'Ethereum',
+          'tokenSymbol': 'eth',
+          'tokenDecimal': 18,
+          'type': getTypeTransaction(address, item.from),
         }
       )
     }
@@ -294,17 +300,17 @@ async function getListTransactionsTRC20(address, contractAddress, size, fingerpr
       const item = listTransactions[i]
       result.push(
         {
-          "from": item.from,
-          "to": item.to,
-          "value": item.value,
-          "timeStamp": Math.floor(item.block_timestamp / 1000),
-          "transaction_id": item.transaction_id,
-          "tokenName": item.token_info.name,
-          "tokenSymbol": item.token_info.symbol,
-          "tokenDecimal": item.token_info.decimals,
-          // "type": (item.type || getTypeTransaction(address, item.from)).toLowerCase(),
-          "type": getTypeTransaction(address, item.from),
-          "fingerprint": response.meta.fingerprint || '',
+          'from': item.from,
+          'to': item.to,
+          'value': item.value,
+          'timeStamp': Math.floor(item.block_timestamp / 1000),
+          'transaction_id': item.transaction_id,
+          'tokenName': item.token_info.name,
+          'tokenSymbol': item.token_info.symbol,
+          'tokenDecimal': item.token_info.decimals,
+          // 'type': (item.type || getTypeTransaction(address, item.from)).toLowerCase(),
+          'type': getTypeTransaction(address, item.from),
+          'fingerprint': response.meta.fingerprint || '',
         }
       )
     }
@@ -328,17 +334,17 @@ async function getListTransactionsTRX(address, size, page) {
       const item = listTransactions[i]
       result.push(
         {
-          "from": item.ownerAddress,
-          "to": item.toAddress,
-          "value": item.amount,
-          "fee": item.cost.fee.toString(),
-          "timeStamp": Math.floor(item.timestamp / 1000),
-          "transaction_id": item.hash,
-          "tokenName": 'Tron',
-          "tokenSymbol": 'trx',
-          "tokenDecimal": 6,
-          // "type": (item.type || getTypeTransaction(address, item.ownerAddress)).toLowerCase(),
-          "type": getTypeTransaction(address, item.ownerAddress),
+          'from': item.ownerAddress,
+          'to': item.toAddress,
+          'value': item.amount,
+          'fee': item.cost.fee.toString(),
+          'timeStamp': Math.floor(item.timestamp / 1000),
+          'transaction_id': item.hash,
+          'tokenName': 'Tron',
+          'tokenSymbol': 'trx',
+          'tokenDecimal': 6,
+          // 'type': (item.type || getTypeTransaction(address, item.ownerAddress)).toLowerCase(),
+          'type': getTypeTransaction(address, item.ownerAddress),
         }
       )
     }
@@ -362,16 +368,16 @@ async function getListTransactionsBTC(address, page, size) {
       const item = listTransactions[i]
       result.push(
         {
-          "from": item.inputs[0].prev_out.addr,
-          "to": item.out[0].addr,
-          "transaction_id": item.hash,
-          "timeStamp": item.time,
-          "fee": item.fee.toString(),
-          "value": item.result.toString(),
-          "tokenName": 'Bitcoin',
-          "tokenSymbol": 'BTC',
-          "tokenDecimal": 8,
-          "type": getTypeTransaction(address, item.inputs[0].prev_out.addr),
+          'from': item.inputs[0].prev_out.addr,
+          'to': item.out[0].addr,
+          'transaction_id': item.hash,
+          'timeStamp': item.time,
+          'fee': item.fee.toString(),
+          'value': item.result.toString(),
+          'tokenName': 'Bitcoin',
+          'tokenSymbol': 'BTC',
+          'tokenDecimal': 8,
+          'type': getTypeTransaction(address, item.inputs[0].prev_out.addr),
         }
       )
     }
@@ -395,16 +401,16 @@ async function getListTransactionsPolygon(address, page, size) {
       const item = listTransactions[i]
       result.push(
         {
-          "from": item.from,
-          "to": item.to,
-          "value": item.value,
-          "fee": item.gasUsed,
-          "timeStamp": parseInt(item.timeStamp),
-          "transaction_id": item.hash,
-          "tokenName": 'Ethereum',
-          "tokenSymbol": 'eth',
-          "tokenDecimal": 18,
-          "type": getTypeTransaction(address, item.from),
+          'from': item.from,
+          'to': item.to,
+          'value': item.value,
+          'fee': item.gasUsed,
+          'timeStamp': parseInt(item.timeStamp),
+          'transaction_id': item.hash,
+          'tokenName': 'Ethereum',
+          'tokenSymbol': 'eth',
+          'tokenDecimal': 18,
+          'type': getTypeTransaction(address, item.from),
         }
       )
     }
@@ -459,20 +465,20 @@ async function getListTransactionByBlockCypher(address, code, limit, page, finge
       }
       let type = getTypeTransaction(address, from)
       strRegex = `${address}, `
-      var regex = new RegExp(strRegex, "g")
+      var regex = new RegExp(strRegex, 'g')
       result.push(
         {
-          "from": type == 'transfer' ? address : (from.replace(regex, '') == '' ? '' : from.replace(regex, '').slice(0, -2)),
-          "to": type == 'deposit' ? address : (to.replace(regex, '') == '' ? '' : to.replace(regex, '').slice(0, -2)),
-          "value": Math.abs(value).toString(),
-          "fee": parseFloat(item.fees).toString(),
-          "timeStamp": Math.floor(Date.parse(item.received || item.confirmed) / 1000),
-          "transaction_id": item.hash,
-          "tokenName": getTokenNameByCode(code),
-          "tokenSymbol": code,
-          "tokenDecimal": 8,
-          "type": type,
-          "fingerprint": `${response.hasMore || 'false'}_${item.block_height}`,
+          'from': type == 'transfer' ? address : (from.replace(regex, '') == '' ? '' : from.replace(regex, '').slice(0, -2)),
+          'to': type == 'deposit' ? address : (to.replace(regex, '') == '' ? '' : to.replace(regex, '').slice(0, -2)),
+          'value': Math.abs(value).toString(),
+          'fee': parseFloat(item.fees).toString(),
+          'timeStamp': Math.floor(Date.parse(item.received || item.confirmed) / 1000),
+          'transaction_id': item.hash,
+          'tokenName': getTokenNameByCode(code),
+          'tokenSymbol': code,
+          'tokenDecimal': 8,
+          'type': type,
+          'fingerprint': `${response.hasMore || 'false'}_${item.block_height}`,
         }
       )
     }
@@ -497,16 +503,16 @@ async function getSolTokenTransaction(address, contractAddress, page, size) {
       if (item.tokenAddress === contractAddress) {
         result.push(
           {
-            "from": item.owner,
-            "to": item.tokenAddress,
-            "value": item.changeAmount.toString(),
-            "fee": item.fee.toString(),
-            "timeStamp": parseInt(item.blockTime),
-            "transaction_id": item._id,
-            "tokenName": item.symbol,
-            "tokenSymbol": item.symbol,
-            "tokenDecimal": item.decimals,
-            "type": item.changeType === 'inc' ? 'deposit' : 'transfer',
+            'from': item.owner,
+            'to': item.tokenAddress,
+            'value': item.changeAmount.toString(),
+            'fee': item.fee.toString(),
+            'timeStamp': parseInt(item.blockTime),
+            'transaction_id': item._id,
+            'tokenName': item.symbol,
+            'tokenSymbol': item.symbol,
+            'tokenDecimal': item.decimals,
+            'type': item.changeType === 'inc' ? 'deposit' : 'transfer',
           }
         )
       }
@@ -530,22 +536,118 @@ async function getSolTransactions(address, page, size) {
       const item = listTransactions[i]
       result.push(
         {
-          "from": item.src,
-          "to": item.dst,
-          "value": item.lamport.toString(),
-          "fee": item.fee.toString(),
-          "timeStamp": parseInt(item.blockTime),
-          "transaction_id": item._id,
-          "tokenName": 'Solana',
-          "tokenSymbol": 'Sol',
-          "tokenDecimal": 9,
-          "type": getTypeTransaction(address, item.src),
+          'from': item.src,
+          'to': item.dst,
+          'value': item.lamport.toString(),
+          'fee': item.fee.toString(),
+          'timeStamp': parseInt(item.blockTime),
+          'transaction_id': item._id,
+          'tokenName': 'Solana',
+          'tokenSymbol': 'Sol',
+          'tokenDecimal': 9,
+          'type': getTypeTransaction(address, item.src),
         }
       )
     }
     return result
   } catch (err) {
     console.log(err)
+    return []
+  }
+}
+
+async function getVTHOTransactions(address, page = 1, size = 10) {
+  address = util.strip0x(address)
+  address = util.strPadding(address, 64)
+  address = '0x' + address
+  try {
+    const body = {
+      'options': {
+        'offset': size * (page - 1),
+        'limit': size
+      },
+      'criteriaSet': [
+        {
+          'address': '0x0000000000000000000000000000456e65726779',
+          'topic0': '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+          'topic1': address
+        },
+        {
+          'address': '0x0000000000000000000000000000456e65726779',
+          'topic0': '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+          'topic2': address
+        }
+      ],
+      'order': 'desc'
+    }
+    const response = await httpclient.post('https://explore-testnet.veblocks.net/logs/event', body)
+    const result = []
+    for (var i in response.data) {
+      const item = response.data[i]
+      if (new BigNumber(Number(item.data)).comparedTo('1000000000000000000') != -1) {
+        result.push(
+          {
+            'from': item.meta.txOrigin,
+            'to': '0x' + util.strip0x(item.topics[2]).replace(/^0+/, ''),
+            'value': util.dividedBy(Number(item.data), util.generateDecimalMultiplier(18)),
+            'fee': item.fee || '',
+            'timeStamp': item.meta.blockTimestamp,
+            'transaction_id': item.meta.txID,
+            'tokenName': 'VeThor',
+            'tokenSymbol': 'VTHO',
+            'tokenDecimal': 18,
+            'type': getTypeTransaction(address, item.meta.txOrigin),
+          }
+        )
+      }
+    }
+    return result
+  } catch (error) {
+    return []
+  }
+}
+
+async function getVetTransactions(address, page = 1, size = 10) {
+  try {
+    const body = {
+      'options': {
+        'offset': size * (page - 1),
+        'limit': size
+      },
+      'criteriaSet': [
+        {
+          'sender': address
+        },
+        {
+          'recipient': address
+        }
+      ],
+      'order': 'desc'
+    }
+    const response = await httpclient.post('https://explore-testnet.veblocks.net/logs/transfer', body)
+    const result = []
+    for (var i in response.data) {
+      const item = response.data[i]
+      console.log(Number(item.amount))
+      if (new BigNumber(Number(item.amount)).comparedTo('1000000000000000000') != -1) {
+        result.push(
+          {
+            'from': item.sender,
+            'to': item.recipient,
+            'value': util.dividedBy(Number(item.amount), util.generateDecimalMultiplier(18)),
+            'fee': item.fee || '',
+            'timeStamp': item.meta.blockTimestamp,
+            'transaction_id': item.meta.txID,
+            'tokenName': 'Vechain',
+            'tokenSymbol': 'VET',
+            'tokenDecimal': 18,
+            'type': getTypeTransaction(address, item.sender),
+          }
+        )
+      }
+    }
+    return result
+  } catch (error) {
     return []
   }
 }
@@ -564,16 +666,16 @@ async function getFilTransactions(address, page, size) {
       const item = listTransactions[i]
       result.push(
         {
-          "from": item.from,
-          "to": item.to,
-          "value": item.value,
-          "fee": item.fee || '',
-          "timeStamp": item.timestamp,
-          "transaction_id": item.cid,
-          "tokenName": 'Filecoin',
-          "tokenSymbol": 'FIL',
-          "tokenDecimal": 18,
-          "type": getTypeTransaction(address, item.from) + (item.receipt.exitCode ? '_error' : ''),
+          'from': item.from,
+          'to': item.to,
+          'value': item.value,
+          'fee': item.fee || '',
+          'timeStamp': item.timestamp,
+          'transaction_id': item.cid,
+          'tokenName': 'Filecoin',
+          'tokenSymbol': 'FIL',
+          'tokenDecimal': 18,
+          'type': getTypeTransaction(address, item.from) + (item.receipt.exitCode ? '_error' : ''),
         }
       )
     }
@@ -583,8 +685,6 @@ async function getFilTransactions(address, page, size) {
     return []
   }
 }
-
-https://filfox.info/api/v1/address/f17bsgb6brlnzyezcaw55f4sctw4cm6xlfiwebrci/messages?pageSize=20&page=0
 
 function getTypeTransaction(address, fromAddress) {
   if (fromAddress.toString().includes(address)) {

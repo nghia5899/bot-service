@@ -70,5 +70,44 @@ module.exports = {
     } catch (error) {
       return a
     }
+  },
+  hexToUnsignedInt: function(inputStr) {
+    var hex  = inputStr.toString();
+    var Uint8Array = new Array();
+    for (var n = 0; n < hex.length; n += 2) {
+      Uint8Array.push(parseInt(hex.substr(n, 2), 16));
+    }
+    return Uint8Array;
+  },
+  toHexString: function(byteArray) {
+    return Array.from(byteArray, function(byte) {
+      return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+    }).join('')
+  },
+  generateDecimalMultiplier: function(precision) {
+    let temp = '0000000000000000000000000000000'
+    let result = '1'
+    let target = temp.substr(0, precision)
+    result += target
+    return result
+  },
+  strip0x(str) {
+    try {
+      if (str.indexOf('0x') === 0) {
+        str = str.substr(2)
+      }
+      return str
+    } catch (error) {
+      return str
+    }
+  },
+  strPadding(str, pad) {
+    const padding = pad - str.length;
+    str = this.generateStrPadding(padding) + str;
+    return str;
+  },
+  generateStrPadding(number) {
+    const str = '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+    return str.substr(0, number)
   }
 }
