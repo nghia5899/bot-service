@@ -148,6 +148,8 @@ let coinService = {
           return await getVetTransactions(address, page, size)
         case 'vtho':
           return await getVTHOTransactions(address, page, size)
+        case 'ust': case 'luna':
+          return await getLUNAtransactions(address, page, size, code)
         default:
           break
       }
@@ -684,6 +686,43 @@ async function getFilTransactions(address, page, size) {
     return result
   } catch (err) {
     console.log(err)
+    return []
+  }
+}
+
+async function getLUNAtransactions(address, page = 1, size = 100, code) {
+  size = 100
+  try {
+    const response = await httpclient.get(`https://bombay-fcd.terra.dev/v1/txs?offset=${size * (page - 1)}&limit=${size}&account=${address}`)
+    const result = []
+    for (var i in response.data.txs) {
+      const item = response.data.txs[i]
+      const msg = item.tx.value.msg[0]
+      const msgAmounts = msg.value.amount
+      const strCode = code === 'ust' ? 'uusd' : 'uluna'
+      const uusdt = msgAmounts.find(temp => temp.denom === strCode)
+      if (uusdt) {
+        const value = msg.value
+        const fee = item.tx.value.fee.amount[0]
+        result.push(
+          {
+            'from': value.from_address,
+            'to': value.to_address,
+            'value': util.dividedBy(Number(uusdt.amount), util.generateDecimalMultiplier(6)).toString(),
+            'fee': util.dividedBy(Number(fee.amount.toString()), util.generateDecimalMultiplier(6)).toString() || '',
+            'timeStamp': new Date(item.timestamp).getTime() / 1000,
+            'transaction_id': item.txhash,
+            'tokenName': 'Terra USD',
+            'tokenSymbol': 'UST',
+            'tokenDecimal': 0,
+            'type': getTypeTransaction(address, value.from_address),
+          }
+        )
+      }
+    }
+    return result
+  } catch (error) {
+    console.log(error)
     return []
   }
 }
