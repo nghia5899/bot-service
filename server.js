@@ -6,6 +6,7 @@ const path = require('path')
 const currencyService = require('./services/currency-service')
 const coinService = require('./services/coin-service')
 const app = express();
+const cors = require('cors')
 
 const port = 3005;
 
@@ -18,6 +19,8 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 app.use(express.json())
+
+app.use(cors())
 
 route(app);
 
