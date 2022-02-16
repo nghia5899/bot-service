@@ -93,12 +93,14 @@ let coinService = {
     try {
       const code = bodyData.code
       const isDelete = bodyData.isDelete
-      return new Promise((resolve, reject) => {
-        Coin.findByIdAndUpdate(code.toUpperCase(), { isDelete: isDelete }, (err, result) => {
-          if (err) reject(err)
-          else resolve(result)
+      if (typeof isDelete === 'boolean')
+        return new Promise((resolve, reject) => {
+          Coin.findByIdAndUpdate(code.toUpperCase(), { isDelete: isDelete }, (err, result) => {
+            if (err) throw err
+            else resolve(true)
+          })
         })
-      })
+      return false
     } catch (e) {
       console.log(e)
       throw e
@@ -114,6 +116,42 @@ let coinService = {
           else resolve(result)
         })
       })
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
+  },
+
+  async changeStatusWithdraw(bodyData) {
+    try {
+      const code = bodyData.code
+      const isWithdrawable = bodyData.isWithdrawable
+      if (typeof isWithdrawable === 'boolean')
+        return new Promise((resolve, reject) => {
+          Coin.findByIdAndUpdate(code.toUpperCase(), { isWithdrawable: isWithdrawable }, (err, result) => {
+            if (err) throw err
+            else resolve(true)
+          })
+        })
+      return false
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
+  },
+
+  async changeStatusGetPrice(bodyData) {
+    try {
+      const code = bodyData.code
+      const isGetPrice = bodyData.isGetPrice
+      if (typeof isGetPrice === 'boolean')
+        return new Promise((resolve, reject) => {
+          Coin.findByIdAndUpdate(code.toUpperCase(), { isGetPrice: isGetPrice }, (err, result) => {
+            if (err) throw err
+            else resolve(true)
+          })
+        })
+      return false
     } catch (e) {
       console.log(e)
       throw e

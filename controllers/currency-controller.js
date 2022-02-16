@@ -7,7 +7,7 @@ class CurrencyController {
   async getAllCoupleCurrency(req, res) {
     try {
       let response = await currencyService.getAllCoupleCurrency()
-      return res.json(new ResponseData(true, "Get list couple currency success", response.data).toJson())
+      return res.json(new ResponseData(true, null, response.data).toJson())
     } catch (e) {
       console.log(e)
       return res.json(new ResponseData(false, e).toJson())

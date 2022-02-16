@@ -37,8 +37,11 @@ class CoinController {
 
   async changeStatusCoin(req, res) {
     try {
-      await coinService.changeStatusCoin(req.body)
-      return res.json(new ResponseData(true, "",).toJson())
+      const result = await coinService.changeStatusCoin(req.body)
+      if (result)
+        return res.json(new ResponseData(true, 'Change status coin success',).toJson())
+      else
+        return res.json(new ResponseData(false, 'Some thing error').toJson())
     } catch (e) {
       console.log(e)
       return res.json(new ResponseData(false, e).toJson())
@@ -48,7 +51,33 @@ class CoinController {
   async updateCoin(req, res) {
     try {
       await coinService.updateCoin(req.body)
-      return res.json(new ResponseData(true, "Update success",).toJson())
+      return res.json(new ResponseData(true, 'Update success',).toJson())
+    } catch (e) {
+      console.log(e)
+      return res.json(new ResponseData(false, e).toJson())
+    }
+  }
+
+  async changeStatusWithdraw(req, res) {
+    try {
+      const result = await coinService.changeStatusWithdraw(req.body)
+      if (result)
+        return res.json(new ResponseData(true, 'Change status withdraw success',).toJson())
+      else
+        return res.json(new ResponseData(false, 'Some thing error').toJson())
+    } catch (e) {
+      console.log(e)
+      return res.json(new ResponseData(false, e).toJson())
+    }
+  }
+
+  async changeStatusGetPrice(req, res) {
+    try {
+      const result = await coinService.changeStatusGetPrice(req.body)
+      if (result)
+        return res.json(new ResponseData(true, 'Change status get price success',).toJson())
+      else
+        return res.json(new ResponseData(false, 'Some thing error').toJson())
     } catch (e) {
       console.log(e)
       return res.json(new ResponseData(false, e).toJson())
