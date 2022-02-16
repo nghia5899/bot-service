@@ -13,6 +13,10 @@ router.put('/', authController.isAuth, coinController.updateCoin)
 
 router.put('/status', authController.isAuth, coinController.changeStatusCoin)
 
+router.put('/price', authController.isAuth, coinController.changeStatusGetPrice)
+
+router.put('/withdraw', authController.isAuth, coinController.changeStatusWithdraw)
+
 router.get('/marketdata', coinController.listCoinBalance)
 
 router.get('/fee', coinController.feeWithdraw)
