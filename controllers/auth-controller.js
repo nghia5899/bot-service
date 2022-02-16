@@ -4,8 +4,8 @@ const authService = require('../services/auth-service')
 class AuthController {
   async login(req, res) {
     try {
-      const username = req.body.username.toLowerCase()
-      const password = req.body.password.toLowerCase()
+      const username = req.body.username
+      const password = req.body.password
 
       let user = await authService.getUser(username)
       if (!user) {
@@ -33,6 +33,7 @@ class AuthController {
       return res.json(new ResponseData(true, "", data).toJson()) 
     } catch (e) {
       console.log(e)
+      return res.status(401).json(new ResponseData(false, "Login failed",).toJson())
     }
   }
 
