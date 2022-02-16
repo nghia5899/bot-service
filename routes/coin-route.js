@@ -9,6 +9,8 @@ router.get('/', coinController.listAllCoin)
 
 router.post('/', authController.isAuth, coinController.addCoin)
 
+router.put('/', authController.isAuth, coinController.updateCoin)
+
 router.delete('/', authController.isAuth, coinController.deleteCoin)
 
 router.get('/marketdata', coinController.listCoinBalance)

@@ -6,13 +6,17 @@ const { Market} = require('../models/market')
 const httpclient = require('../http/http-client')
 const util = require('../utils/util')
 const BigNumber = require('bignumber.js')
+const converUtil = require('../utils/convert')
 
 let coinService = {
 
-  async getAllCurrency() {
+  async getAllCurrency(role) {
+    let filter = { isDelete: false }
+    if (converUtil.checkAdmin(role))
+      filter = {}
     return new Promise((resolve, reject) => {
       Coin
-        .find({}, { _id: 0, createdAt: 0, updatedAt: 0, __v: 0 })
+        .find(filter, { _id: 0, createdAt: 0, updatedAt: 0, __v: 0 })
         .exec((err, data) => {
           if (err) return reject(err)
           return resolve({ data: data })
@@ -84,9 +88,24 @@ let coinService = {
     try {
       if (listCoin.length) {
         listCoin.forEach(element => {
-          Coin.collection.deleteOne({ code: element })
+          Coin.findByIdAndUpdate(element.toUpperCase(), { isDelete: true })
         })
       }
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
+  },
+
+  async updateCoin(bodyData) {
+    try {
+      const coin = bodyData
+      return new Promise((resolve, reject) => {
+        Coin.findByIdAndUpdate(coin.code, coin, (err, result) => {
+          if (err) reject(err)
+          else resolve(result)
+        })
+      })
     } catch (e) {
       console.log(e)
       throw e
