@@ -12,6 +12,23 @@ const LIMIT_1_MONTH = 726
 
 let currencyService = {
 
+  async getAllCoupleCurrency() {
+    try {
+      let filter = {}
+      return new Promise((resolve, reject) => {
+        CoupleCurrency
+          .find(filter, { _id: 0, createdAt: 0, updatedAt: 0, __v: 0 })
+          .exec((err, data) => {
+            if (err) return reject(err)
+            return resolve({ data: data })
+          })
+      })
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
+  },
+
   async insertCoupleCurrency(list) {
     try {
       let listCoupleCurrency = list

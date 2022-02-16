@@ -4,6 +4,16 @@ const WAValidator = require('@swyftx/api-crypto-address-validator')
 
 class CurrencyController {
 
+  async getAllCoupleCurrency(req, res) {
+    try {
+      let response = await currencyService.getAllCoupleCurrency()
+      return res.json(new ResponseData(true, "Get list couple currency success", response.data).toJson())
+    } catch (e) {
+      console.log(e)
+      return res.json(new ResponseData(false, e).toJson())
+    }q
+  }
+
   async addCoupleCurrency(req, res) {
     try {
       var listCoupleCurrency = req.body.listCoupleCurrency

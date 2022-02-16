@@ -11,17 +11,22 @@ const converUtil = require('../utils/convert')
 let coinService = {
 
   async getAllCurrency(role) {
-    let filter = { isDelete: false }
-    if (converUtil.checkAdmin(role))
-      filter = {}
-    return new Promise((resolve, reject) => {
-      Coin
-        .find(filter, { _id: 0, createdAt: 0, updatedAt: 0, __v: 0 })
-        .exec((err, data) => {
-          if (err) return reject(err)
-          return resolve({ data: data })
-        })
-    })
+    try {
+      let filter = { isDelete: false }
+      if (converUtil.checkAdmin(role))
+        filter = {}
+      return new Promise((resolve, reject) => {
+        Coin
+          .find(filter, { _id: 0, createdAt: 0, updatedAt: 0, __v: 0 })
+          .exec((err, data) => {
+            if (err) return reject(err)
+            return resolve({ data: data })
+          })
+      })
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
   },
 
   async getBalance() {
@@ -84,13 +89,16 @@ let coinService = {
     }
   },
 
-  deleteCoin(listCoin) {
+  async changeStatusCoin(bodyData) {
     try {
-      if (listCoin.length) {
-        listCoin.forEach(element => {
-          Coin.findByIdAndUpdate(element.toUpperCase(), { isDelete: true })
+      const code = bodyData.code
+      const isDelete = bodyData.isDelete
+      return new Promise((resolve, reject) => {
+        Coin.findByIdAndUpdate(code.toUpperCase(), { isDelete: isDelete }, (err, result) => {
+          if (err) reject(err)
+          else resolve(result)
         })
-      }
+      })
     } catch (e) {
       console.log(e)
       throw e
