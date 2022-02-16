@@ -11,7 +11,7 @@ router.post('/', authController.isAuth, coinController.addCoin)
 
 router.put('/', authController.isAuth, coinController.updateCoin)
 
-router.delete('/', authController.isAuth, coinController.deleteCoin)
+router.put('/status', authController.isAuth, coinController.changeStatusCoin)
 
 router.get('/marketdata', coinController.listCoinBalance)
 

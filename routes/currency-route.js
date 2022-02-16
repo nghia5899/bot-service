@@ -3,6 +3,9 @@ const router = express.Router()
 const {ResponseData} = require('../helpers/response-data')
 const currencyController = require('../controllers/currency-controller')
 const authController = require('../controllers/auth-controller')
+const currencyService = require('../services/currency-service')
+
+router.get('/', currencyController.getAllCoupleCurrency)
 
 router.post('/', authController.isAuth, currencyController.addCoupleCurrency)
 

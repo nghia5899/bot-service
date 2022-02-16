@@ -35,10 +35,9 @@ class CoinController {
     }
   }
 
-  deleteCoin(req, res) {
+  async changeStatusCoin(req, res) {
     try {
-      let listCoin = req.body.listCoin
-      coinService.deleteCoin(listCoin)
+      await coinService.changeStatusCoin(req.body)
       return res.json(new ResponseData(true, "",).toJson())
     } catch (e) {
       console.log(e)
