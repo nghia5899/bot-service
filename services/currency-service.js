@@ -112,11 +112,13 @@ let currencyService = {
   },
 
   async getEthereumTokenInfo(contractAddress, networkType) {
+    networkType = networkType.toLowerCase()
     try {
       rpcNetworkURL = '';
       switch (networkType) {
         case 'ethereum': rpcNetworkURL = 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'; break;
         case 'binance-smart-chain': rpcNetworkURL = 'https://bsc-dataseed.binance.org'; break;
+        case 'aurora': rpcNetworkURL = 'https://mainnet.aurora.dev'; break;
       }
       //get token info by web3 library
       let tokenName = '';

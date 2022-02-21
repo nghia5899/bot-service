@@ -101,6 +101,24 @@ module.exports = {
             response.feeFix = error
           }
           break
+        case 'AURORA':
+          try {
+            const feeData = await feeService.getEthFeeWithCode(code)
+            let ethFee = util.dividedBy(feeData, 1000000000)
+            ethFee = util.multipliedBy(ethFee, 21000)
+            ethFee = util.dividedBy(ethFee, 1000000000)
+            ethFee = util.roundUp(ethFee, 6)
+            response.feeFix = ethFee
+
+            let maxFee = util.dividedBy(feeData, 1000000000)
+            maxFee = util.multipliedBy(maxFee, 150000)
+            maxFee = util.dividedBy(maxFee, 1000000000)
+            maxFee = util.roundUp(maxFee, 6)
+            response.maxFee = maxFee
+          } catch (error) {
+            response.feeFix = error
+          }
+          break
         case 'XLM':
           const feeData = feeService.getXlmFee()
           response.feeFix = util.dividedBy(feeData, 10000000)
