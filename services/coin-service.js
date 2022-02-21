@@ -12,9 +12,8 @@ let coinService = {
 
   async getAllCurrency(role) {
     try {
-      let filter = { isDelete: false }
-      if (converUtil.checkAdmin(role))
-        filter = {}
+      let filter = { $or: [ { isDelete: false }, { isDelete: { $exists: false } } ] } 
+      if (converUtil.checkAdmin(role)) filter = {}
       return new Promise((resolve, reject) => {
         Coin
           .find(filter, { _id: 0, createdAt: 0, updatedAt: 0, __v: 0 })
