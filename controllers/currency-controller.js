@@ -39,7 +39,7 @@ class CurrencyController {
     try {
       let contractAddress = req.query.contractAddress;
       let network = req.query.network;
-      if (network == 'tron') {
+      if (network == 'tron' || network === 'trc20') {
         let result = await currencyService.getTRC20TokenInfo(contractAddress, network);
         if (result != null) {
           return res.json(new ResponseData(true, "success", result).toJson());
