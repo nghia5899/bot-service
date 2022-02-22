@@ -101,7 +101,7 @@ module.exports = {
             response.feeFix = error
           }
           break
-        case 'AURORA':
+        case 'AURORA': case 'AURORA_ERC20':
           try {
             const feeData = await feeService.getEthFeeWithCode(code)
             let ethFee = util.dividedBy(feeData, 1000000000)
