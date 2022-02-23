@@ -56,15 +56,9 @@ let coinService = {
         if (response[1].Response) return
         let listSymbolsPrice = Object.entries(response[1])
         new Map(listSymbolsPrice).forEach((value, key) => {
-          let marketData = new MarketData({ id: key, code: key, price: value.USD })
-          marketData.save((err) => {
-            if (err) {
-              let filter = {
-                code: key
-              }
-              let update = { $set: { price: value.USD } }
-              Coin.collection.findOneAndUpdate(filter, update).catch((err) => { })
-            }
+          let marketData = new MarketData({code: key, price: value.USD })
+          Market.findOneAndUpdate({_id: key}, marketData, (err) => {
+            if (err) throw err
           })
         })
       }
