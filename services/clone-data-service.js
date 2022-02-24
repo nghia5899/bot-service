@@ -23,7 +23,10 @@ let cloneDataModel = {
     return sendrequest({
       uri: URL,
       method: 'GET',
-      }
+      headers: {
+        'authorization': `Apikey ${config.API_KEY}`
+        }
+      },
     )
   },
   
