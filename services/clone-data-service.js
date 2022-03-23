@@ -10,7 +10,7 @@ let cloneDataModel = {
       uri: URL,
       method: 'GET',
       headers: {
-        'authorization': `Apikey ${config.API_KEY}`
+        'authorization': `Apikey ${config.API_KEY_HISTORY_MINUE}`
         }
       }
     )
