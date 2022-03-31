@@ -1,6 +1,8 @@
 const cronJob = require('cron')
 const cloneHistoryService = require('./clone-history-service')
 const coinService = require('./coin-service')
+const logger = require('../helpers/logger')('JobService')
+const botLoggerService = require('../services/bot-logger-service')
 
 let jobAddHistoryMinute = new cronJob.CronJob({
   cronTime: '*/12 * * * *', 
@@ -11,6 +13,7 @@ let jobAddHistoryMinute = new cronJob.CronJob({
       cloneHistoryService.deleteLastHistoryMinute()
     } catch (e) {
       console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
     }
   },
   timeZone: 'Asia/Ho_Chi_Minh'
@@ -25,6 +28,7 @@ let jobAddHistoryHour = new cronJob.CronJob({
       cloneHistoryService.deleteLastHistoryHour()
     } catch (e) {
       console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
     }
   
   },
@@ -39,6 +43,7 @@ let jobGetSymbolsPrice = new cronJob.CronJob({
       coinService.getMarketData()
     } catch (e) {
       console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
     }
   },
   timeZone: 'Asia/Ho_Chi_Minh'
@@ -56,8 +61,9 @@ let jobController = {
     console.log('------------------------')
     try {
       jobAddHistoryMinute.start()
-    } catch (error) {
-      console.log(error)
+    } catch (e) {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
     }
   },
   startjobAddHistoryHour() {
@@ -66,8 +72,9 @@ let jobController = {
     console.log('----------------------')
     try {
       jobAddHistoryHour.start()
-    } catch (error) {
-      console.log(error)
+    } catch (e) {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
     }
     
   },
@@ -77,8 +84,9 @@ let jobController = {
     console.log('-------------------------------')
     try {
       jobGetSymbolsPrice.start()
-    } catch (error) {
-      console.log(error)
+    } catch (e) {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
     }
     
   },
@@ -88,8 +96,9 @@ let jobController = {
     console.log('-----------------------')
     try {
       jobAddHistoryMinute.stop()
-    } catch (error) {
-      console.log(error)
+    } catch (e) {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
     }
     
   },
@@ -99,8 +108,9 @@ let jobController = {
     console.log('---------------------')
     try {
       jobAddHistoryHour.stop()
-    } catch (error) {
-      console.log(error)
+    } catch (e) {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
     }
     
   },
@@ -110,8 +120,9 @@ let jobController = {
     console.log('-------------------------------')
     try {
       jobGetSymbolsPrice.stop()
-    } catch (error) {
-      console.log(error)
+    } catch (e) {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
     }
     
   }

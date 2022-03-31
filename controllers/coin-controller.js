@@ -1,5 +1,7 @@
 const { ResponseData, ResponseDataWithPagination } = require('../helpers/response-data')
 const coinService = require('../services/coin-service')
+const botLoggerService = require('../services/bot-logger-service')
+const logger = require('../helpers/logger')('CoinController')
 
 class CoinController {
 
@@ -8,9 +10,10 @@ class CoinController {
       const role = req.query.role
       let response = await coinService.getAllCurrency(role)
       return res.json(new ResponseData(true, "", response.data).toJson())
-    } catch (err) {
-      console.log(err)
-      return res.json(new ResponseData(false, err).toJson())
+    } catch (e) {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
+      return res.json(new ResponseData(false, e).toJson())
     }
   }
 
@@ -18,9 +21,10 @@ class CoinController {
     try {
       let response = await coinService.getBalance()
       return res.json(new ResponseData(true, "", response.data).toJson())
-    } catch (err) {
-      console.log(err)
-      return res.json(new ResponseData(false, err).toJson())
+    } catch (e) {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
+      return res.json(new ResponseData(false, e).toJson())
     }
   }
 
@@ -31,6 +35,7 @@ class CoinController {
       return res.json(new ResponseData(true, "",).toJson())
     } catch (e) {
       console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -44,6 +49,7 @@ class CoinController {
         return res.json(new ResponseData(false, 'Some thing error').toJson())
     } catch (e) {
       console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -54,6 +60,7 @@ class CoinController {
       return res.json(new ResponseData(true, 'Update success',).toJson())
     } catch (e) {
       console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -67,6 +74,7 @@ class CoinController {
         return res.json(new ResponseData(false, 'Some thing error').toJson())
     } catch (e) {
       console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -80,6 +88,7 @@ class CoinController {
         return res.json(new ResponseData(false, 'Some thing error').toJson())
     } catch (e) {
       console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -90,6 +99,7 @@ class CoinController {
       return res.json(new ResponseData(true, "", response).toJson())
     } catch (e) {
       console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -98,8 +108,10 @@ class CoinController {
     try {
       let response = await coinService.getCurrencyByCode(req.query.code)
       return res.json(new ResponseData(true, '', response).toJson())
-    } catch (error) {
-      return res.json(new ResponseData(false, error).toJson())
+    } catch (e) {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
+      return res.json(new ResponseData(false, e).toJson())
     }
   }
 
@@ -114,11 +126,12 @@ class CoinController {
       let fingerprint = req.query.fingerprint;
       let response = await coinService.getListTransactions(address, code, contractAddress, network, page, size, fingerprint);
       return res.json(new ResponseData(true, 'Success', response).toJson());
-    } catch (error) {
-      return res.json(new ResponseData(false, error).toJson())
+    } catch (e) {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
+      return res.json(new ResponseData(false, e).toJson())
     }
   }
-
 }
 
 module.exports = new CoinController

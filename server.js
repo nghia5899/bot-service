@@ -7,6 +7,8 @@ const currencyService = require('./services/currency-service')
 const coinService = require('./services/coin-service')
 const app = express();
 const cors = require('cors')
+const logger = require('./helpers/logger')('Node server')
+const botLoggerService = require('./services/bot-logger-service')
 
 const port = 3005;
 
@@ -26,4 +28,5 @@ route(app);
 
 app.listen(port, function() {
     console.log('Node server running @ http://localhost:'+ port + '...')
+    botLoggerService.sendMessage(logger(`'Node server running @ http://localhost:'+ ${port} + '...'`))
 })
