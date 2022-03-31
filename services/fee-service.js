@@ -41,6 +41,10 @@ module.exports = {
         url = 'https://mainnet.aurora.dev'
         defaultFee = 5000000000
         break
+      case 'KCS':
+        url = 'https://rpc-mainnet.kcc.network'
+        defaultFee = 5000000000
+        break
       default:
         break
     }
