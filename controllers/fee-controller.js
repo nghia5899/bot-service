@@ -2,6 +2,9 @@ const { default: RangeSet } = require('ripple-lib/dist/npm/common/rangeset')
 const {ResponseData} = require('../helpers/response-data')
 const feeService = require('../services/fee-service')
 const util = require('../utils/util')
+const botLoggerService = require('../services/bot-logger-service')
+const logger = require('../helpers/logger')('FeeController')
+
 module.exports = {
   getXrpFee: function (req, res) {
     feeService.getFee(req.body.code.toUpperCase()).then(async rs => {
@@ -9,14 +12,16 @@ module.exports = {
       try {
         const feeData = await feeService.getXrpFee(req.body)
         response.feeFix = parseFloat(feeData)
-      } catch (error) {
-        response.feeFix = error
+      } catch (e) {
+        response.feeFix = e
+        botLoggerService.sendMessage(logger(e.message))
       }
       response.minimunBalance = 0
       res.json(new ResponseData(true, '', response).toJson())
-    }).catch(err => {
-      console.log(err)
-      res.json(new ResponseData(false, null, err.message).toJson())
+    }).catch(e => {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
+      res.json(new ResponseData(false, null, e.message).toJson())
     })
   },
   getFee: function(req, res) {
@@ -43,8 +48,9 @@ module.exports = {
             maxFee = util.dividedBy(maxFee, 1000000000)
             maxFee = util.roundUp(maxFee, 6)
             response.maxFee = maxFee
-          } catch (error) {
-            response.feeFix = error
+          } catch (e) {
+            response.feeFix = e
+            botLoggerService.sendMessage(logger(e.message))
           }
           break
         case 'BSC': case 'BEP20':
@@ -61,8 +67,9 @@ module.exports = {
             maxFee = util.dividedBy(maxFee, 1000000000)
             maxFee = util.roundUp(maxFee, 6)
             response.maxFee = maxFee
-          } catch (error) {
-            response.feeFix = error
+          } catch (e) {
+            response.feeFix = e
+            botLoggerService.sendMessage(logger(e.message))
           }
           break
         case 'MATIC':
@@ -79,8 +86,9 @@ module.exports = {
             maxFee = util.dividedBy(maxFee, 1000000000)
             maxFee = util.roundUp(maxFee, 6)
             response.maxFee = maxFee
-          } catch (error) {
-            response.feeFix = error
+          } catch (e) {
+            response.feeFix = e
+            botLoggerService.sendMessage(logger(e.message))
           }
           break
         case 'ETC':
@@ -97,8 +105,9 @@ module.exports = {
             maxFee = util.dividedBy(maxFee, 1000000000)
             maxFee = util.roundUp(maxFee, 6)
             response.maxFee = maxFee
-          } catch (error) {
-            response.feeFix = error
+          } catch (e) {
+            response.feeFix = e
+            botLoggerService.sendMessage(logger(e.message))
           }
           break
         case 'AURORA': case 'AURORA_ERC20':
@@ -115,8 +124,9 @@ module.exports = {
             maxFee = util.dividedBy(maxFee, 1000000000)
             maxFee = util.roundUp(maxFee, 6)
             response.maxFee = maxFee
-          } catch (error) {
-            response.feeFix = error
+          } catch (e) {
+            response.feeFix = e
+            botLoggerService.sendMessage(logger(e.message))
           }
           break
         case 'XLM':
@@ -130,9 +140,10 @@ module.exports = {
       }
 
       res.json(new ResponseData(true, '', response).toJson())
-    }).catch(err => {
-      console.log(err)
-      res.json(new ResponseData(false, null, err.message).toJson())
+    }).catch(e => {
+      console.log(e)
+      botLoggerService.sendMessage(logger(e.message))
+      res.json(new ResponseData(false, null, e.message).toJson())
     })
   }
 }

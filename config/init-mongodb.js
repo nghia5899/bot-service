@@ -3,6 +3,8 @@ const server = 'mongodb://127.0.0.1:27017'
 const database =  process.env.MONGODB_DATABASE || 'crypto'
 const jobService = require('../services/job-service')
 const cloneHistoryService = require('../services/clone-history-service')
+const botLoggerService = require('../services/bot-logger-service')
+const logger = require('../helpers/logger')('Init mongoose')
 
 console.log(server)
 mongoose
@@ -12,8 +14,8 @@ mongoose
     useFindAndModify: false,
     // useCreateIndex: true,
   })
-  .catch((err) => {
-    console.log(err.message)
+  .catch((e) => {
+    console.log(e.message)
   })
 
 mongoose.connection.on('connected', () => {
@@ -24,8 +26,8 @@ mongoose.connection.on('connected', () => {
   jobService.startJobGetSymbolsPrice()
 })
 
-mongoose.connection.on('error', (err) => {
-  console.log(err.message)
+mongoose.connection.on('error', (e) => {
+  console.log(e.message)
 })
 
 mongoose.connection.on('disconnected', () => {
