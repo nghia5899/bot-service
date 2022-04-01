@@ -45,6 +45,10 @@ module.exports = {
         url = 'https://rpc-mainnet.kcc.network'
         defaultFee = 5000000000
         break
+      case 'KAI': case 'KRC20':
+        url = 'https://rpc.kardiachain.io'
+        defaultFee = 10000000000
+        break
       default:
         break
     }
