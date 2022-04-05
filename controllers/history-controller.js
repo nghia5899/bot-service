@@ -2,7 +2,6 @@ const historyService = require('../services/history-service')
 const cloneHistoryService = require('../services/clone-history-service')
 const {ResponseData} = require('../helpers/response-data')
 const botLoggerService = require('../services/bot-logger-service')
-const logger = require('../helpers/logger')('HistoryController')
 
 class HistoryController {
   
@@ -19,7 +18,7 @@ class HistoryController {
       return res.json(new ResponseData(true, "", response).toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -37,7 +36,7 @@ class HistoryController {
       return res.json(new ResponseData(true, "", response).toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -48,7 +47,7 @@ class HistoryController {
       return res.json(new ResponseData(true, "Refresh success").toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }

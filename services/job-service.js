@@ -13,7 +13,7 @@ let jobAddHistoryMinute = new cronJob.CronJob({
       cloneHistoryService.deleteLastHistoryMinute()
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
     }
   },
   timeZone: 'Asia/Ho_Chi_Minh'
@@ -28,7 +28,7 @@ let jobAddHistoryHour = new cronJob.CronJob({
       cloneHistoryService.deleteLastHistoryHour()
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
     }
   
   },
@@ -43,7 +43,7 @@ let jobGetSymbolsPrice = new cronJob.CronJob({
       coinService.getMarketData()
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(error)
     }
   },
   timeZone: 'Asia/Ho_Chi_Minh'
@@ -63,7 +63,7 @@ let jobController = {
       jobAddHistoryMinute.start()
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
     }
   },
   startjobAddHistoryHour() {
@@ -74,7 +74,7 @@ let jobController = {
       jobAddHistoryHour.start()
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
     }
     
   },
@@ -86,7 +86,7 @@ let jobController = {
       jobGetSymbolsPrice.start()
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
     }
     
   },
@@ -98,7 +98,7 @@ let jobController = {
       jobAddHistoryMinute.stop()
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
     }
     
   },
@@ -110,7 +110,7 @@ let jobController = {
       jobAddHistoryHour.stop()
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
     }
     
   },
@@ -122,7 +122,7 @@ let jobController = {
       jobGetSymbolsPrice.stop()
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
     }
     
   }

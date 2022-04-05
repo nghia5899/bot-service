@@ -2,7 +2,6 @@ const { ResponseData } = require('../helpers/response-data')
 const currencyService = require('../services/currency-service')
 const WAValidator = require('@swyftx/api-crypto-address-validator')
 const botLoggerService = require('../services/bot-logger-service')
-const logger = require('../helpers/logger')('CurrencyController')
 
 class CurrencyController {
 
@@ -12,7 +11,7 @@ class CurrencyController {
       return res.json(new ResponseData(true, null, response.data).toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -24,7 +23,7 @@ class CurrencyController {
       return res.json(new ResponseData(true, "Add list couple currency success").toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -35,7 +34,7 @@ class CurrencyController {
       currencyService.deleteCoupleCurrency(listCoupleCurrency)
       return res.json(new ResponseData(true, "Delete success").toJson())
     } catch (e) {
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -58,7 +57,7 @@ class CurrencyController {
       return res.json(new ResponseData(false, "Currency information not found").toJson());
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson());
     }
   }
@@ -77,7 +76,7 @@ class CurrencyController {
       }
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       // Can not validate Address
       return res.json(new ResponseData(true, "Can not validate Address", true).toJson());
     }
