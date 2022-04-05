@@ -1,7 +1,6 @@
 const jobService = require('../services/job-service')
 const {ResponseData} = require('../helpers/response-data')
 const botLoggerService = require('../services/bot-logger-service')
-const logger = require('../helpers/logger')('JobController')
 
 class JobController {
   startJob = (req, res) => {
@@ -11,7 +10,7 @@ class JobController {
       return res.json(new ResponseData(true, "Start job addAllCurrencyHistory success").toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -23,7 +22,7 @@ class JobController {
       return res.json(new ResponseData(true, "Stop job addAllCurrencyHistory success").toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }

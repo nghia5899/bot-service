@@ -3,7 +3,6 @@ const {ResponseData} = require('../helpers/response-data')
 const feeService = require('../services/fee-service')
 const util = require('../utils/util')
 const botLoggerService = require('../services/bot-logger-service')
-const logger = require('../helpers/logger')('FeeController')
 
 module.exports = {
   getXrpFee: function (req, res) {
@@ -14,13 +13,13 @@ module.exports = {
         response.feeFix = parseFloat(feeData)
       } catch (e) {
         response.feeFix = e
-        botLoggerService.sendMessage(logger(e.message))
+        botLoggerService.sendErrorMessage(e)
       }
       response.minimunBalance = 0
       res.json(new ResponseData(true, '', response).toJson())
     }).catch(e => {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       res.json(new ResponseData(false, null, e.message).toJson())
     })
   },
@@ -50,7 +49,7 @@ module.exports = {
             response.maxFee = maxFee
           } catch (e) {
             response.feeFix = e
-            botLoggerService.sendMessage(logger(e.message))
+            botLoggerService.sendErrorMessage(e)
           }
           break
         case 'BSC': case 'BEP20':
@@ -69,7 +68,7 @@ module.exports = {
             response.maxFee = maxFee
           } catch (e) {
             response.feeFix = e
-            botLoggerService.sendMessage(logger(e.message))
+            botLoggerService.sendErrorMessage(e)
           }
           break
         case 'MATIC':
@@ -88,7 +87,7 @@ module.exports = {
             response.maxFee = maxFee
           } catch (e) {
             response.feeFix = e
-            botLoggerService.sendMessage(logger(e.message))
+            botLoggerService.sendErrorMessage(e)
           }
           break
         case 'ETC':
@@ -107,7 +106,7 @@ module.exports = {
             response.maxFee = maxFee
           } catch (e) {
             response.feeFix = e
-            botLoggerService.sendMessage(logger(e.message))
+            botLoggerService.sendErrorMessage(e)
           }
           break
         case 'AURORA': case 'AURORA_ERC20':
@@ -126,7 +125,7 @@ module.exports = {
             response.maxFee = maxFee
           } catch (e) {
             response.feeFix = e
-            botLoggerService.sendMessage(logger(e.message))
+            botLoggerService.sendErrorMessage(e)
           }
           break
         case 'KCS':
@@ -178,7 +177,7 @@ module.exports = {
       res.json(new ResponseData(true, '', response).toJson())
     }).catch(e => {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       res.json(new ResponseData(false, null, e.message).toJson())
     })
   }

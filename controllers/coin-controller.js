@@ -1,7 +1,7 @@
 const { ResponseData, ResponseDataWithPagination } = require('../helpers/response-data')
 const coinService = require('../services/coin-service')
 const botLoggerService = require('../services/bot-logger-service')
-const logger = require('../helpers/logger')('CoinController')
+
 
 class CoinController {
 
@@ -12,7 +12,7 @@ class CoinController {
       return res.json(new ResponseData(true, "", response.data).toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -23,7 +23,7 @@ class CoinController {
       return res.json(new ResponseData(true, "", response.data).toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -35,7 +35,7 @@ class CoinController {
       return res.json(new ResponseData(true, "",).toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -49,7 +49,7 @@ class CoinController {
         return res.json(new ResponseData(false, 'Some thing error').toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -60,7 +60,7 @@ class CoinController {
       return res.json(new ResponseData(true, 'Update success',).toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -74,7 +74,7 @@ class CoinController {
         return res.json(new ResponseData(false, 'Some thing error').toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -88,7 +88,7 @@ class CoinController {
         return res.json(new ResponseData(false, 'Some thing error').toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -99,7 +99,7 @@ class CoinController {
       return res.json(new ResponseData(true, "", response).toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -110,7 +110,7 @@ class CoinController {
       return res.json(new ResponseData(true, '', response).toJson())
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
@@ -128,7 +128,7 @@ class CoinController {
       return res.json(new ResponseData(true, 'Success', response).toJson());
     } catch (e) {
       console.log(e)
-      botLoggerService.sendMessage(logger(e.message))
+      botLoggerService.sendErrorMessage(e)
       return res.json(new ResponseData(false, e).toJson())
     }
   }
