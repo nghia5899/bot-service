@@ -1,13 +1,12 @@
 const cronJob = require('cron')
 const coinService = require('./coin-service')
-const botLoggerService = require('../services/bot-logger-service')
 
-let jobAddHistoryMinute = new cronJob.CronJob({
-  cronTime: '*/12 * * * *', 
+let jobGetBalance = new cronJob.CronJob({
+  cronTime: '*/1 * * * *', 
   onTick: async function() {
-    console.log(`History minute - ${getTime()}`)
+    console.log(`Time - ${getTime()}`)
     try {
-      botLoggerService.sendMessage("Toi la bot day")
+      coinService.getBalance()
     } catch (e) {
       console.log(e)
     }
@@ -21,22 +20,22 @@ function getTime() {
 }
 
 let jobController = {
-  startjobAddHistoryMinute() {
-    console.log('------------------------')
-    console.log('| Start Job Add Minute |')
-    console.log('------------------------')
+  startJobGetBalances() {
+    console.log('--------------------------')
+    console.log('| Start Job Get Balances |')
+    console.log('--------------------------')
     try {
-      jobAddHistoryMinute.start()
+      jobGetBalance.start()
     } catch (e) {
       console.log(e)
     }
   },
-  stopJobAddHistoryMinute() {
-    console.log('-----------------------')
-    console.log('| Stop Job Add Minute |')
-    console.log('-----------------------')
+  stopJobGetBalances() {
+    console.log('--------------------------')
+    console.log('| Stop Job Get Balances  |')
+    console.log('--------------------------')
     try {
-      jobAddHistoryMinute.stop()
+      jobGetBalance.stop()
     } catch (e) {
       console.log(e)
     }

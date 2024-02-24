@@ -5,8 +5,8 @@ const route = require('./routes/index-routes')
 const path = require('path')
 const app = express();
 const cors = require('cors')
-const logger = require('./helpers/logger')('Node server')
-const botLoggerService = require('./services/bot-logger-service')
+const coinService = require('./services/coin-service')
+const jobService = require('./services/job-service')
 
 const port = 3005;
 
@@ -23,6 +23,10 @@ app.use(express.json())
 app.use(cors())
 
 route(app);
+
+coinService.getBalance()
+
+jobService.startJobGetBalances()
 
 app.listen(port, function() {
     console.log('Node server running @ http://localhost:'+ port + '...')

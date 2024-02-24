@@ -1,8 +1,7 @@
 const mongoose = require('mongoose')
-const server = 'mongodb://127.0.0.1:27017'
-const database =  process.env.MONGODB_DATABASE || 'crypto'
-const jobService = require('../services/job-service')
-const botLoggerService = require('../services/bot-logger-service')
+const server = process.env.MONGODB_DATABASE_URL || 'mongodb://127.0.0.1:27017'
+const database =  process.env.MONGODB_DATABASE || 'bot-binance'
+
 
 console.log(server)
 mongoose

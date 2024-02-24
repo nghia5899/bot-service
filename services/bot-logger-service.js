@@ -7,7 +7,10 @@ module.exports = {
   sendMessage: function(message) {
     try {
       if (process.env.IGNORE_TELEGRAM_BOT) return
-      bot.telegram.sendMessage(config.CHAT_ID, message)
+      const listChatId = config.LIST_CHAT_ID
+      for (let i = 0; i < listChatId.length; i += 1) {
+        bot.telegram.sendMessage(listChatId[i], message)
+      }
     } catch (e) {
       console.log(e)
     }
