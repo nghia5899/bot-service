@@ -7,7 +7,6 @@ const LIST_CHAT_ID = [
 const LIST_COIN = [
   'BNB',
   'USDT',
-  'SOLO'
 ]
 
 module.exports = {

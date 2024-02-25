@@ -8,7 +8,7 @@ const cors = require('cors')
 const coinService = require('./services/coin-service')
 const jobService = require('./services/job-service')
 
-const port = 3005;
+const port = 3006;
 
 require('./config/init-mongodb')
 
@@ -24,7 +24,7 @@ app.use(cors())
 
 route(app);
 
-coinService.getBalance()
+coinService.getHistoryDeposit()
 
 jobService.startJobGetBalances()
 

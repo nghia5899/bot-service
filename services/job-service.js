@@ -2,7 +2,7 @@ const cronJob = require('cron')
 const coinService = require('./coin-service')
 
 let jobGetBalance = new cronJob.CronJob({
-  cronTime: '*/1 * * * *', 
+  cronTime: '*/30 * * * *', 
   onTick: async function() {
     console.log(`Time - ${getTime()}`)
     try {

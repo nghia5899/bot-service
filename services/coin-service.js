@@ -1,6 +1,7 @@
 const { Coin } = require('../models/coin')
+const { History } = require('../models/history')
 const config = require('../config/config')
-
+const binanceService = require('./binance-service');
 const Binance = require('node-binance-api');
 const botLoggerService = require('./bot-logger-service');
 
@@ -49,11 +50,133 @@ let coinService = {
       });
     } catch (e) {
       console.log(e)
-      throw e
     }
   },
+  async getHistoryDeposit() {
+    await binance.useServerTime();
+    binance.depositHistory(async (error, response) => {
+      try {
+        if (error) return console.error(error.body);
+        console.log(response);
+        const listHistory = await History.find({type: 'deposit'}, {__v: 0 }, {sort: {timeInsert: -1}})
+        //check listHistory empty
+        if (listHistory) {
+          let listNewTransaction = []
+          for (let i = 0; i < response.length; i += 1) {
+            let check = false
+            //check id da ton tai chua
+            for (let j = 0; j < listHistory.length; j ++) {
+              if (response[i].id == listHistory[j].idTx) {
+                check = true
+              }
+            }
+            console.log(check)
+            //chua ton tai add vao list moi
+            if (!check) {
+              listNewTransaction.push(response[i])
+            }
+          }
 
-
+          //xoa data cu thay data moi
+          if (listNewTransaction.length > 0) {
+            for (let i = 0; i < listNewTransaction.length; i += 1) {
+              let messages = 'Deposit: \n'
+              messages += 'id: ' + response[i].id +'\n'
+              messages += 'coin: ' + response[i].coin +'\n'
+              messages += 'amount: ' + response[i].amount +'\n'
+              messages += 'address: ' + response[i].address +'\n'
+              const date = new Date(response[i].insertTime);
+              const time = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${('0'+date.getMinutes()).substr(-2)}:${date.getSeconds()}`
+              messages += 'time: ' + time +'\n'
+              botLoggerService.sendMessage(messages)
+            }
+            History.deleteMany({type: 'deposit'}, function(err) {
+              if (err) return
+              for (let i = 0; i < response.length; i += 1) {
+                History({
+                  type: 'deposit',
+                  idTx: response[i].id,
+                  insertTime: response[i].insertTime,
+                }).save()
+              }
+            })
+          }
+        } else {
+          for (let i = 0; i < response.length; i += 1) {
+            History({
+              type: 'deposit',
+              idTx: response[i].id,
+              insertTime: response[i].insertTime,
+            }).save()
+          }
+        }
+      }  catch(e) {
+        console.log(e)
+      }
+    },
+      {
+        offset: 0,
+        limit: 10,
+      }
+    )
+  },
+  async getHistoryWithdraw() {
+    await binance.useServerTime();
+    binance.withdrawHistory(async (error, response) => {
+      console.info(response);
+      const listHistory = await History.find({type: 'withdraw'}, {__v: 0 }, {sort: {timeInsert: -1}})
+      //check listHistory empty
+      if (listHistory) {
+        let listNewTransaction = []
+        for (let i = 0; i < response.length; i += 1) {
+          let check = false
+          //check id da ton tai chua
+          for (let j = 0; j < listHistory.length; j += 1) {
+            if (response[i] == listHistory[j]) {
+              check = true
+            }
+          }
+          console.log('check', check)
+          //chua ton tai add vao list moi
+          if (!check) {
+            listNewTransaction.push(response[i])
+          }
+        }
+        //xoa data cu thay data moi
+        if (listNewTransaction.length > 0) {
+          History.deleteMany({type: 'withdraw'}, function(err) {
+            if (err) return
+            for (let i = 0; i < response.length; i += 1) {
+              History({
+                type: 'withdraw',
+                idTx: response[i].id,
+                insertTime: Date.parse(response[i].completeTime),
+              }).save()
+            }
+          })
+        }
+      } else {
+        for (let i = 0; i < response.length; i += 1) {
+          History({
+            type: 'withdraw',
+            idTx: response[i].id,
+            insertTime: response[i].insertTime,
+          }).save()
+        }
+      }
+    },
+    {
+      offset: 0,
+      limit: 10
+    }
+    ) 
+  },
+  async accountSnapshot() {
+    const time = await binance.useServerTime();
+    console.log(time)
+    const res = await binanceService.getHistoryTransfer(time.serverTime)
+    console.log(res.data)
+  }
 }
 
 function CoinData(coin) {
