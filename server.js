@@ -24,7 +24,7 @@ app.use(cors())
 
 route(app);
 
-coinService.getHistoryDeposit()
+coinService.getHistoryWithdraw()
 
 jobService.startJobGetBalances()
 

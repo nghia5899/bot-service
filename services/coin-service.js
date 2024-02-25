@@ -57,7 +57,6 @@ let coinService = {
     binance.depositHistory(async (error, response) => {
       try {
         if (error) return console.error(error.body);
-        console.log(response);
         const listHistory = await History.find({type: 'deposit'}, {__v: 0 }, {sort: {timeInsert: -1}})
         //check listHistory empty
         if (listHistory) {
@@ -70,22 +69,20 @@ let coinService = {
                 check = true
               }
             }
-            console.log(check)
             //chua ton tai add vao list moi
             if (!check) {
               listNewTransaction.push(response[i])
             }
           }
-
           //xoa data cu thay data moi
           if (listNewTransaction.length > 0) {
             for (let i = 0; i < listNewTransaction.length; i += 1) {
               let messages = 'Deposit: \n'
-              messages += 'id: ' + response[i].id +'\n'
-              messages += 'coin: ' + response[i].coin +'\n'
-              messages += 'amount: ' + response[i].amount +'\n'
-              messages += 'address: ' + response[i].address +'\n'
-              const date = new Date(response[i].insertTime);
+              messages += 'id: ' + listNewTransaction[i].id +'\n'
+              messages += 'coin: ' + listNewTransaction[i].coin +'\n'
+              messages += 'amount: ' + listNewTransaction[i].amount +'\n'
+              messages += 'address: ' + listNewTransaction[i].address +'\n'
+              const date = new Date(listNewTransaction[i].insertTime);
               const time = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${('0'+date.getMinutes()).substr(-2)}:${date.getSeconds()}`
               messages += 'time: ' + time +'\n'
               botLoggerService.sendMessage(messages)
@@ -132,11 +129,10 @@ let coinService = {
           let check = false
           //check id da ton tai chua
           for (let j = 0; j < listHistory.length; j += 1) {
-            if (response[i] == listHistory[j]) {
+            if (response[i].id == listHistory[j].idTx) {
               check = true
             }
           }
-          console.log('check', check)
           //chua ton tai add vao list moi
           if (!check) {
             listNewTransaction.push(response[i])
@@ -144,6 +140,16 @@ let coinService = {
         }
         //xoa data cu thay data moi
         if (listNewTransaction.length > 0) {
+          for (let i = 0; i < listNewTransaction.length; i += 1) {
+            let messages = 'Withdraw: \n'
+            messages += 'id: ' + listNewTransaction[i].id +'\n'
+            messages += 'coin: ' + listNewTransaction[i].coin +'\n'
+            messages += 'amount: ' + listNewTransaction[i].amount +'\n'
+            messages += 'address: ' + listNewTransaction[i].address +'\n'
+            messages += 'time: ' + listNewTransaction[i].completeTime +'\n'
+            botLoggerService.sendMessage(messages)
+            console.log('bot send', listNewTransaction[i].id)
+          }
           History.deleteMany({type: 'withdraw'}, function(err) {
             if (err) return
             for (let i = 0; i < response.length; i += 1) {

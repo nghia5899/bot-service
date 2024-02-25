@@ -14,6 +14,20 @@ let jobGetBalance = new cronJob.CronJob({
   timeZone: 'Asia/Ho_Chi_Minh'
 })
 
+let jobGetHistory = new cronJob.CronJob({
+  cronTime: '*/20 * * * * *', 
+  onTick: async function() {
+    console.log(`Time - ${getTime()}`)
+    try {
+      coinService.getHistoryDeposit()
+      coinService.getHistoryWithdraw()
+    } catch (e) {
+      console.log(e)
+    }
+  },
+  timeZone: 'Asia/Ho_Chi_Minh'
+})
+
 function getTime() {
   let today = new Date();
   return `${today} ${Date.now()}`
@@ -26,6 +40,7 @@ let jobController = {
     console.log('--------------------------')
     try {
       jobGetBalance.start()
+      jobGetHistory.start()
     } catch (e) {
       console.log(e)
     }
