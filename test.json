@@ -1,0 +1,176 @@
+[
+  {
+    "_category_": "client_event",
+    "format_version": 2,
+    "triggered_on": 1707967964602,
+    "message": "normal/blue500/light",
+    "event_info": "normal/blue500/light",
+    "items": [],
+    "event_namespace": {
+      "page": "app",
+      "component": "theme",
+      "action": "launch",
+      "client": "m5"
+    },
+    "client_event_sequence_start_timestamp": 1707967964529,
+    "client_event_sequence_number": 1,
+    "client_app_id": "3033300"
+  },
+  {
+    "_category_": "client_event",
+    "format_version": 2,
+    "triggered_on": 1707967964808,
+    "tweet_id": "1757843982791643607",
+    "items": [],
+    "event_namespace": {
+      "page": "tweet",
+      "action": "show",
+      "client": "m5"
+    },
+    "client_event_sequence_start_timestamp": 1707967964529,
+    "client_event_sequence_number": 2,
+    "client_app_id": "3033300"
+  },
+  {
+    "_category_": "client_event",
+    "format_version": 2,
+    "triggered_on": 1707967965289,
+    "tweet_id": "1757843982791643607",
+    "event_initiator": 0,
+    "new_entries": 2,
+    "new_tweets": 2,
+    "items": [
+      {
+        "item_type": 0,
+        "id": "1757843982791643607",
+        "author_id": "1736445965731811328",
+        "in_reply_to_tweet_id": "1757801917298938350",
+        "in_reply_to_author_id": "1539308438030667777",
+        "is_viewer_follows_tweet_author": false,
+        "is_tweet_author_follows_viewer": false,
+        "is_viewer_super_following_tweet_author": false,
+        "is_viewer_super_followed_by_tweet_author": false,
+        "is_tweet_author_super_followable": false,
+        "engagement_metrics": {
+          "reply_count": 0,
+          "retweet_count": 0,
+          "favorite_count": 0,
+          "quote_count": 0
+        }
+      }
+    ],
+    "event_namespace": {
+      "page": "tweet",
+      "action": "get_initial",
+      "client": "m5"
+    },
+    "client_event_sequence_start_timestamp": 1707967964529,
+    "client_event_sequence_number": 3,
+    "client_app_id": "3033300"
+  },
+  {
+    "_category_": "client_event",
+    "format_version": 2,
+    "triggered_on": 1707967965648,
+    "tweet_id": "1757843982791643607",
+    "items": [
+      {
+        "item_type": 0,
+        "id": "1757843982791643607",
+        "author_id": "1736445965731811328",
+        "in_reply_to_tweet_id": "1757801917298938350",
+        "in_reply_to_author_id": "1539308438030667777",
+        "is_viewer_follows_tweet_author": false,
+        "is_tweet_author_follows_viewer": false,
+        "is_viewer_super_following_tweet_author": false,
+        "is_viewer_super_followed_by_tweet_author": false,
+        "is_tweet_author_super_followable": false,
+        "engagement_metrics": {
+          "reply_count": 0,
+          "retweet_count": 0,
+          "favorite_count": 0,
+          "quote_count": 0
+        }
+      }
+    ],
+    "event_namespace": {
+      "page": "tweet",
+      "action": "bottom",
+      "client": "m5"
+    },
+    "client_event_sequence_start_timestamp": 1707967964529,
+    "client_event_sequence_number": 4,
+    "client_app_id": "3033300"
+  },
+  {
+    "_category_": "client_event",
+    "format_version": 2,
+    "triggered_on": 1707967966037,
+    "items": [
+      {
+        "item_type": 0,
+        "id": "1757843982791643607",
+        "position": 1,
+        "sort_index": "7465528054063132200",
+        "percent_screen_height_100k": 28444,
+        "author_id": "1736445965731811328",
+        "in_reply_to_tweet_id": "1757801917298938350",
+        "in_reply_to_author_id": "1539308438030667777",
+        "is_viewer_follows_tweet_author": false,
+        "is_tweet_author_follows_viewer": false,
+        "is_viewer_super_following_tweet_author": false,
+        "is_viewer_super_followed_by_tweet_author": false,
+        "is_tweet_author_super_followable": false,
+        "engagement_metrics": {
+          "reply_count": 0,
+          "retweet_count": 0,
+          "favorite_count": 0,
+          "quote_count": 0
+        }
+      },
+      {
+        "item_type": 0,
+        "id": "1757801917298938350",
+        "position": 0,
+        "sort_index": "7465570119555837457",
+        "percent_screen_height_100k": 69000,
+        "author_id": "1539308438030667777",
+        "is_viewer_follows_tweet_author": true,
+        "is_tweet_author_follows_viewer": false,
+        "is_viewer_super_following_tweet_author": false,
+        "is_viewer_super_followed_by_tweet_author": false,
+        "is_tweet_author_super_followable": false,
+        "media_details": {
+          "photo_count": 1,
+          "content_id": "1757801911112400896",
+          "publisher_id": "1539308438030667777",
+          "media_type": 8,
+          "dynamic_ads": false
+        },
+        "media_details_v2": [
+          {
+            "content_id": "1757801911112400896",
+            "publisher_id": "1539308438030667777",
+            "media_type": 8,
+            "dynamic_ads": false
+          }
+        ],
+        "engagement_metrics": {
+          "reply_count": 13,
+          "retweet_count": 7,
+          "favorite_count": 291,
+          "quote_count": 0
+        }
+      }
+    ],
+    "event_namespace": {
+      "page": "tweet",
+      "component": "stream",
+      "action": "results",
+      "client": "m5"
+    },
+    "client_event_sequence_start_timestamp": 1707967964529,
+    "client_event_sequence_number": 5,
+    "client_app_id": "3033300"
+  }
+]
