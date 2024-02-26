@@ -1,27 +1,32 @@
 const { Coin } = require('../models/coin')
-const cloneDataModel = require('./clone-data-service')
 const request = require('request')
 const config = require('../config/config')
-const { Market} = require('../models/market')
 const httpclient = require('../http/http-client')
 const util = require('../utils/util')
 const BigNumber = require('bignumber.js')
 const converUtil = require('../utils/convert')
 
-let coinService = {
+const Binance = require('node-binance-api');
+const binance = new Binance().options({
+  APIKEY: 'wnyiHvwuGLqP7dRzETQQmVYLuJCja7bLoqsa91QefHU3LTkFjyws0TxmIo1GsOin',
+  APISECRET: 'RL6tdabBjxqBebMuBRKJA8lbWhVvzX9WiSMChd06Rw7ZquMkcXGjTRnVQl8Q3xhA',
+  'family': 4,
+  'tld':'us',
+  useServerTime: true,
+  recvWindow: 5000, // Set a higher recvWindow to increase response timeout
+  verbose: true, // Add extra output when subscribing to WebSockets, etc
+  log: log => {
+    console.log(log); // You can create your own logger here, or disable console output
+  }
+});
 
-  async getAllCurrency(role) {
+let coinService = {
+  async getBalance() {
     try {
-      let filter = { $or: [ { isDelete: false }, { isDelete: { $exists: false } } ] } 
-      if (converUtil.checkAdmin(role)) filter = {}
-      return new Promise((resolve, reject) => {
-        Coin
-          .find(filter, { _id: 0, createdAt: 0, updatedAt: 0, __v: 0 })
-          .exec((err, data) => {
-            if (err) return reject(err)
-            return resolve({ data: data })
-          })
-      })
+      binance.balance((error, balances) => {
+        if (error) return console.error(error);
+        console.info("ETH balance: ", balances);
+      });
     } catch (e) {
       console.log(e)
       throw e
@@ -46,5 +51,7 @@ function MarketData(market) {
     price: market.price,
   })
 }
+
+
 
 module.exports = coinService

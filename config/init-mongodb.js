@@ -2,9 +2,7 @@ const mongoose = require('mongoose')
 const server = 'mongodb://127.0.0.1:27017'
 const database =  process.env.MONGODB_DATABASE || 'crypto'
 const jobService = require('../services/job-service')
-const cloneHistoryService = require('../services/clone-history-service')
 const botLoggerService = require('../services/bot-logger-service')
-const logger = require('../helpers/logger')('Init mongoose')
 
 console.log(server)
 mongoose
@@ -20,10 +18,6 @@ mongoose
 
 mongoose.connection.on('connected', () => {
   console.log('mongodb connected.......')
-  cloneHistoryService.refreshAllHistory()
-  jobService.startjobAddHistoryMinute()
-  jobService.startjobAddHistoryHour()
-  jobService.startJobGetSymbolsPrice()
 })
 
 mongoose.connection.on('error', (e) => {
@@ -32,9 +26,6 @@ mongoose.connection.on('error', (e) => {
 
 mongoose.connection.on('disconnected', () => {
   console.log('mongodb connection is disconnected.')
-  jobService.stopJobAddHistoryMinute()
-  jobService.stopJobAddHistoryHour()
-  jobService.stopJobGetSymbolsPrice()
 })
 
 module.exports = mongoose.connection
