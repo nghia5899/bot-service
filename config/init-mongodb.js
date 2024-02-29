@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const server = process.env.MONGODB_DATABASE_URL || 'mongodb://127.0.0.1:27017'
-const database =  process.env.MONGODB_DATABASE || 'bot-binance'
+const database =  process.env.MONGODB_DATABASE || 'bot-service'
 
 
 console.log(server)

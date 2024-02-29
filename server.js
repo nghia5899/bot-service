@@ -7,6 +7,8 @@ const app = express();
 const cors = require('cors')
 const coinService = require('./services/coin-service')
 const jobService = require('./services/job-service')
+const config = require('./config/config')
+const {Config } = require('./models/config')
 
 const port = 3006;
 
@@ -24,10 +26,21 @@ app.use(cors())
 
 route(app);
 
-coinService.getHistoryWithdraw()
+initConfig()
+
 
 jobService.startJobGetBalances()
 
 app.listen(port, function() {
     console.log('Node server running @ http://localhost:'+ port + '...')
 })
+
+async function initConfig() {
+    let res = await Config.findOne({})
+    if (!res) {
+        Config({
+            statusBalanceChange: true,
+            apiKey: '111111'
+        }).save()
+    }
+}

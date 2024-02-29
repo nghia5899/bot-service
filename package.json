@@ -33,7 +33,7 @@
     "request": "^2.88.2",
     "ripple-lib": "*",
     "stellar-sdk": "^8.3.0",
-    "telegraf": "^4.7.0",
+    "telegraf": "^4.16.2",
     "web3": "^1.5.3"
   }
 }

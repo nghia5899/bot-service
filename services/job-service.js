@@ -1,12 +1,17 @@
 const cronJob = require('cron')
 const coinService = require('./coin-service')
+const { Wallet } = require('../models/wallet')
 
 let jobGetBalance = new cronJob.CronJob({
-  cronTime: '*/30 * * * *', 
+  cronTime: ' */10 * * * *', 
   onTick: async function() {
-    console.log(`Time - ${getTime()}`)
+    console.log(`Time - ${getTime().toLocaleLowerCase()}`)
     try {
-      coinService.getBalance()
+      const listWallet = await Wallet.find()
+      for (let j = 0; j < listWallet.length; j++) {
+        const binnaceObj = coinService.BinaceOption(listWallet[j])
+        binnaceObj.getBalance()
+      }
     } catch (e) {
       console.log(e)
     }
@@ -19,8 +24,7 @@ let jobGetHistory = new cronJob.CronJob({
   onTick: async function() {
     console.log(`Time - ${getTime()}`)
     try {
-      coinService.getHistoryDeposit()
-      coinService.getHistoryWithdraw()
+      logicJob()
     } catch (e) {
       console.log(e)
     }
@@ -28,16 +32,27 @@ let jobGetHistory = new cronJob.CronJob({
   timeZone: 'Asia/Ho_Chi_Minh'
 })
 
+async function logicJob() {
+  const listWallet = await Wallet.find()
+  for (let j = 0; j < listWallet.length; j++) {
+    console.log(listWallet[j].id)
+    const binnaceObj = coinService.BinaceOption(listWallet[j])
+    binnaceObj.getHistoryDeposit()
+    binnaceObj.getHistoryWithdraw()
+    binnaceObj.checkBalance()
+  }
+}
+
 function getTime() {
   let today = new Date();
-  return `${today} ${Date.now()}`
+  return `${today.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })} ${Date.now()}`
 }
 
 let jobController = {
   startJobGetBalances() {
-    console.log('--------------------------')
-    console.log('| Start Job Get Balances |')
-    console.log('--------------------------')
+    console.log('----------------------------')
+    console.log('| Start Job Check Balances |')
+    console.log('----------------------------')
     try {
       jobGetBalance.start()
       jobGetHistory.start()
@@ -46,11 +61,12 @@ let jobController = {
     }
   },
   stopJobGetBalances() {
-    console.log('--------------------------')
-    console.log('| Stop Job Get Balances  |')
-    console.log('--------------------------')
+    console.log('----------------------------')
+    console.log('| Stop Job Check Balances  |')
+    console.log('----------------------------')
     try {
       jobGetBalance.stop()
+      jobGetHistory.stop()
     } catch (e) {
       console.log(e)
     }

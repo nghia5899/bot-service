@@ -1,6 +1,7 @@
 let mongoose = require("mongoose");
 
 let HistorySchema = new mongoose.Schema({
+  idWallet: {type: String, required:false, default: ''},
   type: {type: String, required:false, default: ''},
   idTx: {type: String, required:false, default: ''},
   insertTime: {type: Number, required:false, default: 0},
