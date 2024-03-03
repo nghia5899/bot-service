@@ -3,7 +3,7 @@ const coinService = require('./coin-service')
 const { Wallet } = require('../models/wallet')
 
 let jobGetBalance = new cronJob.CronJob({
-  cronTime: ' */10 * * * *', 
+  cronTime: '*/20 * * * *', 
   onTick: async function() {
     console.log(`Time - ${getTime().toLocaleLowerCase()}`)
     try {
@@ -37,8 +37,8 @@ async function logicJob() {
   for (let j = 0; j < listWallet.length; j++) {
     console.log(listWallet[j].id)
     const binnaceObj = coinService.BinaceOption(listWallet[j])
-    binnaceObj.getHistoryDeposit()
-    binnaceObj.getHistoryWithdraw()
+    /* binnaceObj.getHistoryDeposit()
+    binnaceObj.getHistoryWithdraw() */
     binnaceObj.checkBalance()
   }
 }
