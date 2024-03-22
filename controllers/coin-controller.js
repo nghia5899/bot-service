@@ -1,7 +1,5 @@
 const { ResponseData, ResponseDataWithPagination } = require('../helpers/response-data')
 const coinService = require('../services/coin-service')
-const botLoggerService = require('../services/bot-logger-service')
-
 
 class CoinController {
 

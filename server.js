@@ -7,6 +7,7 @@ const app = express();
 const cors = require('cors')
 const coinService = require('./services/coin-service')
 const jobService = require('./services/job-service')
+const bot = require('./bot/bot-service')
 const config = require('./config/config')
 const {Config } = require('./models/config')
 
@@ -30,6 +31,8 @@ initConfig()
 
 
 jobService.startJobGetBalances()
+
+//jobService.updateTimeBalance(2)
 
 app.listen(port, function() {
     console.log('Node server running @ http://localhost:'+ port + '...')

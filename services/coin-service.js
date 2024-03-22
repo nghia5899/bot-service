@@ -4,7 +4,10 @@ const { Wallet } = require('../models/wallet')
 const config = require('../config/config')
 const binanceService = require('./binance-service');
 const Binance = require('node-binance-api');
-const botLoggerService = require('./bot-logger-service');
+const botLoggerService = require('../bot/bot-logger-service');
+const { Config } = require('../models/config');
+const { list } = require('pm2');
+const { resolve } = require('path');
 
 const binance = new Binance().options({
   APIKEY: config.API_KEY,
@@ -19,7 +22,72 @@ const binance = new Binance().options({
   }
 });
 
-let coinService = {
+const coinService = {
+   async enableWallet(strings) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const wallet = await Wallet.findOne({_id: strings[0]})
+        if (!wallet) {
+          return resolve({status: false, message: 'Ví không đúng'})
+        }
+        await Wallet.findOneAndUpdate({_id: strings[0]}, {status: true}, function(err) {
+          if (err) console.log(err)
+          return resolve({status: true})
+        })
+      } catch (e) {
+        return resolve({status: false, message: 'Ví không đúng'})
+      }
+    })
+  },
+  disableWallet(strings) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const wallet = await Wallet.findOne({_id: strings[0]})
+        if (!wallet) {
+          return resolve({status: false, message: 'Ví không đúng'})
+        }
+        await Wallet.findOneAndUpdate({_id: strings[0]}, {status: false}, function(err) {
+          if (err) console.log(err)
+          return resolve({status: true})
+        })
+      } catch (e) {
+        return resolve({status: false, message: 'Ví không đúng'})
+      }
+    })
+  },
+  async enableBalanceChange(strings) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const wallet = await Wallet.findOne({_id: strings[0]})
+        if (!wallet) {
+          return resolve({status: false, message: 'Ví không đúng'})
+        }
+        await Wallet.findOneAndUpdate({_id: strings[0]}, {statusChange: true}, function(err) {
+          if (err) console.log(err)
+          return resolve({status: true})
+        })
+      } catch (e) {
+        return resolve({status: false, message: 'Ví không đúng'})
+      }
+    })
+  },
+  disableBalanceChange(strings) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const wallet = await Wallet.findOne({_id: strings[0]})
+        if (!wallet) {
+          return resolve({status: false, message: 'Ví không đúng'})
+        }
+        console.log('disableBalanceChange')
+        await Wallet.findOneAndUpdate({_id: strings[0]}, {statusChange: false}, function(err) {
+          if (err) console.log(err)
+          return resolve({status: true})
+        })
+      } catch (e) {
+        return resolve({status: false, message: 'Ví không đúng'})
+      }
+    })
+  },
   async addWallet(req) {
     return new Promise(async function(resolve, reject) {
       try {
@@ -30,14 +98,100 @@ let coinService = {
             api_key: listWallet[i].api_key,
             api_secret: listWallet[i].api_secret,
             status: true,
+            statusBalanceChange: true,
           }).save()
         }
         const list = await Wallet.find({}, {__v: 0 , createdAt: 0, updatedAt: 0})
         return resolve(list)
       } catch (e) {
         console.log(e)
-        console.log(logger(e))
         return resolve(false)
+      }
+    })
+  },
+  async addWalletFromBot(wallet) {
+    return new Promise(async function(resolve, reject) {
+      try {
+        const response = await Wallet({
+          name: wallet.name,
+          api_key: wallet.api_key,
+          api_secret: wallet.api_secret,
+          status: true,
+          statusBalanceChange: true,
+        }).save()
+        if (!response) return resolve({status: false, message: 'Lỗi'})
+        const listCoin = config.LIST_COIN
+        for (let i = 0; i < listCoin.length; i += 1) {
+          Coin({
+            idWallet: response.id,
+            typeWallet: 'spot',
+            code: listCoin[i],
+            amount: 0,
+          }).save()
+          Coin({
+            idWallet: response.id,
+            typeWallet: 'funding',
+            code: listCoin[i],
+            amount: 0,
+          }).save()
+        }
+        return resolve({status: true})
+      } catch (e) {
+        console.log(e)
+        return resolve({status: false, message: 'Ví không đúng'})
+      }
+    })
+  },
+  async deleteWalletFromBot(wallet) {
+    return new Promise(async function(resolve, reject) {
+      try {
+        Wallet.findOneAndDelete({_id: wallet.id} , function (err, docs) { 
+          if (err){ 
+            console.log(err) 
+            return resolve({status: false, message: 'Lỗi'})
+          }
+          return resolve({status: true})
+        }); 
+        Coin.deleteMany({idWallet: wallet.id},async function(err) {
+          if (err){ 
+            console.log(err) 
+          }
+          return resolve({status: true})
+        })
+      } catch (e) {
+        console.log(e)
+        return resolve({status: false, message: 'Ví không đúng'})
+      }
+    })
+  },
+  async updateWalletFromBot(wallet) {
+    return new Promise(async function(resolve, reject) {
+      try {
+        Wallet.findOneAndUpdate({_id: wallet.id}, wallet, function (err, docs) { 
+          if (err){ 
+            console.log(err) 
+            return resolve({status: false, message: 'Lỗi'})
+          }
+          return resolve({status: true})
+        }); 
+      } catch (e) {
+        console.log(e)
+        return resolve({status: false, message: 'Ví không đúng'})
+      }
+    })
+  },
+  async listWalletFromBot() {
+    return new Promise(async function(resolve, reject) {
+      try {
+        const listWallet = await Wallet.find({})
+        if (listWallet) {
+          return resolve({status: true, wallets: listWallet})
+        } else {
+          return resolve({status: false, message: 'Không tìm thấy ví nào'})
+        }
+      } catch (e) {
+        console.log(e)
+        return resolve({status: false, message: 'Ví không đúng'})
       }
     })
   },
@@ -61,166 +215,243 @@ let coinService = {
       }
     });
     return {
-      getBalance: async function() {
-        try {
-          const time = await binance.useServerTime();
-          const balances = await binance.balance()
-          const balancesFunding = await binanceService.getHistoryTransfer(time.serverTime)
-          console.log(balancesFunding)
-          console.log('------ getBalance ------')
-          console.log('-----> Success')
-          let messages = `Name: ${wallet.name} \n` + 'Balances: \n'
-          const listCoin = config.LIST_COIN
-          for (let i = 0; i < listCoin.length; i += 1) {
-            const coin = listCoin[i]
-            let total = 0
-            messages += 'Coin: ' + coin + '\n'
-            if (balances) {
-              const coinData = await Coin.findOne({code: coin, idWallet: wallet.id, typeWallet: 'spot'})
-              messages += '-Spot: ' + balances[coin].available + '\n'
-              total += parseFloat(balances[coin].available)
-              if (coinData) {
-                let update = {
-                  amount: balances[coin].available
-                }
-                Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'spot'}, update,{ new: true}, function(err) {
-                  if (err) console.log(err)
-                })
-              } else {
-                Coin({
-                  idWallet: wallet.id,
-                  typeWallet: 'spot',
-                  code: coin,
-                  amount: balances[coin].available,
-                }).save()
-              }
+      getBalance: async function(ctx) {
+        return new Promise(async (resolve, reject) => {
+          try {
+            let totalBalance = {}
+            const time = await binance.useServerTime();
+            let balances
+            let balancesFunding
+            try {
+              balances = await binance.balance()
+            } catch (e) {
+  
             }
-
-            if (balancesFunding.data && balancesFunding.data.length > 0) {
-              const coinDataFunding = await Coin.findOne({code: coin, idWallet: wallet.id, typeWallet: 'funding'})
-              const asset = balancesFunding.data.find(x => x.asset === coin)
-              console.log(Boolean(asset))
-              if (!asset) {
-                messages += '-Funding: 0' + '\n'
-                Coin({
-                  idWallet: wallet.id,
-                  typeWallet: 'funding',
-                  code: coin,
-                  amount: 0,
-                }).save()
-              } else {
-                messages += '-Funding: ' + asset.free + '\n'
-                total += parseFloat(asset.free)
-                if (coinDataFunding) {
+            try {
+              balancesFunding = await binanceService.getBalanceFunding(time.serverTime, wallet)
+            } catch (e) {
+  
+            }
+            console.log('------ getBalance ------')
+            console.log('-----> Success')
+            let messages = `Name: ${wallet.name} \n` + 'Balances: \n'
+            const listCoin = config.LIST_COIN
+            for (let i = 0; i < listCoin.length; i += 1) {
+              const coin = listCoin[i]
+              let total = 0
+              messages += 'Coin: ' + coin + '\n'
+              if (balances) {
+                const coinData = await Coin.findOne({code: coin, idWallet: wallet.id, typeWallet: 'spot'})
+                messages += '-Spot: ' + Math.floor(balances[coin].available) + '\n'
+                total += parseFloat(balances[coin].available)
+                if (coinData) {
                   let update = {
-                    amount: asset.free
+                    amount: balances[coin].available
                   }
-                  Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'funding'}, update,{ new: true}, function(err) {
+                  Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'spot'}, update, function(err) {
                     if (err) console.log(err)
                   })
                 } else {
                   Coin({
                     idWallet: wallet.id,
-                    typeWallet: 'funding',
+                    typeWallet: 'spot',
                     code: coin,
-                    amount: asset.available,
+                    amount: balances[coin].available,
                   }).save()
                 }
+              } else {
+                messages += '-Spot: 0' + '\n'
               }
+              
+              if (balancesFunding) {
+                try {
+                  const coinDataFunding = await Coin.findOne({code: coin, idWallet: wallet.id, typeWallet: 'funding'})
+                  console.log(coinDataFunding)
+                  const asset = balancesFunding.find(x => x.asset === coin)
+                  if (!asset) {
+                    messages += '-Funding: 0' + '\n'
+                    if (!coinDataFunding) {
+                      Coin({
+                        idWallet: wallet.id,
+                        typeWallet: 'funding',
+                        code: coin,
+                        amount: 0,
+                      }).save()
+                    }
+                  } else {
+                    messages += '-Funding: ' + asset.free + '\n'
+                    total += parseFloat(asset.free)
+                    if (coinDataFunding) {
+                      let update = {
+                        amount: asset.free
+                      }
+                      Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'funding'}, update, function(err) {
+                        if (err) console.log(err)
+                      })
+                    } else {
+                      Coin({
+                        idWallet: wallet.id,
+                        typeWallet: 'funding',
+                        code: coin,
+                        amount: asset.available,
+                      }).save()
+                    }
+                  }
+                } catch(e) {
+                  console.log(e)
+                }
+              } else {
+                messages += '-Funding: 0' + '\n'
+              }
+              messages += '-Total: ' + total + '\n'
+              totalBalance[coin] = total
             }
-            messages += '-Total: ' + total + '\n'
-
+            if (ctx) {
+              const chatId = ctx.message.chat.id
+              await ctx.telegram.sendMessage(chatId, messages)
+            } else {
+              console.log('send')
+              await botLoggerService.sendMessage(messages, wallet.status)
+            }
+            return resolve(totalBalance)
+          } catch (e) {
+            console.log(e)
+            console.log('-----> Fail')
+            return resolve([])
           }
-  
-          botLoggerService.sendMessage(messages, wallet.status)
-        } catch (e) {
-          console.log(e)
-          console.log('-----> Fail')
-        }
+        })
       },
       checkBalance: async function() {
-        try {
-          const time = await binance.useServerTime();
-          let listNewBalance = []
-          const listCoin = config.LIST_COIN
-          const balances = await binance.balance()
-          const balancesFunding = await binanceService.getHistoryTransfer(time.serverTime)
-          console.log('------ checkBalance ------')
-          if (!balances) return
-          console.log('-----> Success')
-          const listCoinHistory = await Coin.find({idWallet: wallet.id, typeWallet: 'spot'})
-          const listCoinHistoryFunding = await Coin.find({idWallet: wallet.id, typeWallet: 'funding'})
-          let messages = `Wallet: ${wallet.name} \n` + 'Balance change: \n'
-          for (let i = 0; i < listCoin.length; i += 1) {
-            const coin = listCoin[i]
-            console.log(coin)
-            let total = 0
-            let checkSend = false
-            if (balances) {
-              let oldBalance = 0
-              let check = false
-              for (let j = 0; j < listCoinHistory.length; j++) {
-                if (coin == listCoinHistory[j].code) {
-                  if (parseFloat(balances[coin].available) != listCoinHistory[j].amount) {
-                    check = true
-                    oldBalance = listCoinHistory[j].amount
+        return new Promise(async (resolve, reject) => {
+          try {
+            let totalBalance = {
+              checkSend: false,
+            }
+            const time = await binance.useServerTime();
+            const listCoin = config.LIST_COIN
+            let balances
+            try {
+              balances = await binance.balance()
+            } catch (e) {
+  
+            }
+            const balancesFunding = await binanceService.getBalanceFunding(time.serverTime, wallet)
+            console.log('------ checkBalance ------')
+            console.log('-----> Success')
+            const listCoinHistory = await Coin.find({idWallet: wallet.id, typeWallet: 'spot'})
+            const listCoinHistoryFunding = await Coin.find({idWallet: wallet.id, typeWallet: 'funding'})
+            let messages = `Wallet: ${wallet.name} \n` + 'Balance change: \n'
+            for (let i = 0; i < listCoin.length; i += 1) {
+              const coin = listCoin[i]
+              let total = 0
+              let totalOld = 0
+              let checkSend = false
+              let oldBalanceSpot = 0
+              if (balances) {
+                try {
+                  let check = false
+                  for (let j = 0; j < listCoinHistory.length; j++) {
+                    if (coin == listCoinHistory[j].code) {
+                      oldBalanceSpot = listCoinHistory[j].amount
+                      if (parseFloat(balances[coin].available) != listCoinHistory[j].amount) {
+                        console.log(listCoinHistory[j].amount)
+                        check = true
+                        break
+                      }
+                    }
+                  }
+                  messages += 'Coin: ' + coin +'\n'
+                  messages += '-Type: Spot' +'\n'
+                  messages += '-OldAmount: ' + oldBalanceSpot +'\n'
+                  messages += '-NewAmount: ' + parseFloat(balances[coin].available) +'\n'
+                  totalOld += oldBalanceSpot
+                  total += parseFloat(balances[coin].available)
+                  if (check) {
+                    checkSend = true
+                    let update = {
+                      amount: balances[coin].available
+                    }
+                    Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'spot'}, update,{ new: true}, function(err) {
+                      if (err) console.log(err)
+                    })
+                  }
+                } catch (e) {
+                  console.log(e)
+                }
+              } else {
+                for (let j = 0; j < listCoinHistory.length; j++) {
+                  if (coin == listCoinHistory[j].code) {
+                    oldBalanceSpot = listCoinHistory[j].amount
                     break
                   }
                 }
+                messages += 'Coin: ' + coin +'\n'
+                messages += '-Type: Spot' +'\n'
+                messages += '-OldAmount: ' + oldBalanceSpot +'\n'
+                messages += '-NewAmount: ' + oldBalanceSpot +'\n'
               }
-              messages += 'Coin: ' + coin +'\n'
-              messages += '-Type: Spot' +'\n'
-              messages += '-OldAmount: ' + oldBalance +'\n'
-              messages += '-NewAmount: ' + parseFloat(balances[coin].available) +'\n'
-              total += parseFloat(balances[coin].available)
-              if (check) {
-                checkSend = true
-                let update = {
-                  amount: balances[coin].available
+  
+              let oldBalanceFunding = 0
+              if (balancesFunding) {
+                try {
+                  const asset = balancesFunding.find(x => x.asset === coin)
+                  let newAmount = 0
+                  if (asset) {
+                    newAmount = asset.free
+                  }
+                  let check = false
+                  for (let j = 0; j < listCoinHistoryFunding.length; j++) {
+                    if (coin == listCoinHistoryFunding[j].code) {
+                      if (parseFloat(newAmount) !=  parseFloat(listCoinHistoryFunding[j].amount)) {
+                        check = true
+                        oldBalanceFunding = listCoinHistoryFunding[j].amount
+                        break
+                      }
+                    }
+                  }
+                  messages += '-Type: Funding' +'\n'
+                  messages += '-OldAmount: ' + oldBalanceFunding +'\n'
+                  messages += '-NewAmount: ' + newAmount +'\n'
+                  totalOld += oldBalanceFunding
+                  total += parseFloat(newAmount)
+                  if (check) {
+                    checkSend = true
+                    let update = {
+                      amount: parseFloat(newAmount)
+                    }
+                    Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'funding'}, update,{ new: true}, function(err) {
+                      if (err) console.log(err)
+                    })
+                  }
+                } catch (e) {
+                  console.log(e)
                 }
-                Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'spot'}, update,{ new: true}, function(err) {
-                  if (err) console.log(err)
-                })
-              }
-            }
-
-            if (balancesFunding.data && balancesFunding.data.length > 0) {
-              const asset = balancesFunding.data.find(x => x.asset === coin)
-              if (asset) {
-                let oldBalance = 0
-                let check = false
+              } else {
                 for (let j = 0; j < listCoinHistoryFunding.length; j++) {
                   if (coin == listCoinHistoryFunding[j].code) {
-                    if (parseFloat(asset.free) != listCoinHistoryFunding[j].amount) {
-                      check = true
-                      oldBalance = listCoinHistoryFunding[j].amount
-                      break
-                    }
+                    oldBalanceFunding = listCoinHistoryFunding[j].amount
+                    break
                   }
                 }
                 messages += '-Type: Funding' +'\n'
-                messages += '-OldAmount: ' + oldBalance +'\n'
-                messages += '-NewAmount: ' + asset.free +'\n'
-                total += parseFloat(asset.free)
-                if (check) {
-                  checkSend = true
-                  let update = {
-                    amount: parseFloat(asset.free)
-                  }
-                  Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'funding'}, update,{ new: true}, function(err) {
-                    if (err) console.log(err)
-                  })
-                }
+                messages += '-OldAmount: ' + oldBalanceFunding +'\n'
+                messages += '-NewAmount: ' + oldBalanceFunding+'\n'
               }
+  
+              messages += 'Total: ' + total + '\n'
+              totalBalance[coin] = {old: totalOld, new: total}
+              if (checkSend) {
+                console.log('vao day')
+                await botLoggerService.sendMessage(messages, wallet.statusChange)
+                totalBalance.checkSend = true
+              }
+              return resolve(totalBalance)
             }
-            messages += 'Total: ' + total + '\n'
-            if (checkSend) {
-              botLoggerService.sendMessage(messages, wallet.status)
-            }
+          } catch (e) {
+            console.log(e)
+            return resolve({USDT: {old: -1, new: -1}, checkSend: false})
           }
-        } catch (e) {
-          console.log(e)
-        }
+        })
       },
       getHistoryDeposit: async function() {
         await binance.useServerTime();
@@ -366,7 +597,7 @@ let coinService = {
     }
   },
  test: async function () {
-    binanceService.getHistoryTransfer()
+    console.log('test')
   }
 }
 

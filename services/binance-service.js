@@ -7,26 +7,27 @@ let binanceService = {
     const query = `timestamp=${time}&recvWindow=60000`
     return await callApiBinance('https://api.binance.com/sapi/v1/asset/get-funding-asset', query)
   },
-  async getBalanceFunding(time) {
+  async getBalanceFunding(time, wallet) {
     try {
       const query = `timestamp=${time}&recvWindow=60000`
-      return await callApiBinance('https://api.binance.com/sapi/v1/asset/get-funding-asset', query)
+      const res = await callApiBinance('https://api.binance.com/sapi/v1/asset/get-funding-asset', query, wallet)
+      if (res) return res.data || []
     } catch (e) {
-      console.log(e)
-      return null
+      //console.log(e)
+      return false
     }
   }  
 }
 
 
-function callApiBinance(url, query) {
+function callApiBinance(url, query, wallet) {
   return new Promise((resolve, reject) => {
-    const sig = signature(query)
+    const sig = signature(query, wallet)
     const data = query + '&signature=' + sig
     console.log(config.API_KEY)
     const instance = axios.create({
       headers: {
-        'X-MBX-APIKEY': config.API_KEY,
+        'X-MBX-APIKEY': wallet.api_key,
       }
     })
     instance.post(url + '?' + data)
@@ -38,9 +39,9 @@ function callApiBinance(url, query) {
   })
 }
 
-function signature(query_string) {
+function signature(query_string, wallet) {
     return crypto
-        .createHmac('sha256', config.API_SECRET)
+        .createHmac('sha256', wallet.api_secret)
         .update(query_string)
         .digest('hex');
 }
