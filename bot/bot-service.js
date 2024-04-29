@@ -1,18 +1,196 @@
 const coinService = require('../services/coin-service')
 const jobService = require('../services/job-service.js')
-const { Telegraf } = require('telegraf')
+const { Telegraf, Markup } = require('telegraf')
 const config = require('../config/config.js')
 const PATH = require('path')
-const bot = new Telegraf(config.BOT_TOKEN)
+const bot = new Telegraf('6518426353:AAEkUtoRsydeUZ7HlRIIXQEvVDHybQtdNHs')
 const {message } = require('telegraf/filters')
 const { Wallet } = require('../models/wallet')
 const { Chat } = require('../models/chat')
 const botLoggerService = require('./bot-logger-service');
+const redisClient = require('../config/redis.js');
 
-bot.start((ctx) => ctx.reply('Welcome'))
-bot.help((ctx) => ctx.reply("Send me a sticker"));
+bot.start( async (ctx) => {
+  backToMenu(ctx)
+})
+
+bot.webhookCallback
+
+bot.action('wallet_cb', async (ctx) => {
+  await ctx.deleteMessage()
+  ctx.telegram.sendMessage(ctx.chat.id, 'Select option', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Add", callback_data: "wallet_add_cb"}, {text: "Update", callback_data: "wallet_update_cb"}],
+          [{text: "Delete", callback_data: "wallet_delete_cb"}, {text: "List", callback_data: "wallet_list_cb"}],
+          [{text: "Back", callback_data: "back_to_main_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+bot.action('back_to_wallet_menu_cb', async (ctx) => {
+  backToWalletMenu(ctx)
+})
+
+bot.action('wallet_add_cb',  async (ctx) => {
+  try {
+    console.log(ctx.chat.id)
+    await redisClient.set(`${ctx.chat.id}`, 'add')
+    ctx.telegram.sendMessage(ctx.chat.id, 'Add wallet: \n {Name}/{api_key}/{secret_key} \n', 
+      {
+        reply_markup: {
+          inline_keyboard: [
+            [{text: "Back", callback_data: "back_to_wallet_menu_cb"}]
+          ]
+        }
+      }
+    )
+  } catch (e) {
+    console.log(e)
+  }
+})
+
+bot.action('wallet_update_cb',  async (ctx) => {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Add wallet: \n {Name}/{api_key}/{secret_key} \n', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Back", callback_data: "back_to_wallet_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+bot.action('wallet_delete_cb',  async (ctx) => {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Add wallet: \n {Name}/{api_key}/{secret_key} \n', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Back", callback_data: "back_to_wallet_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+bot.action('wallet_list_cb',  async (ctx) => {
+  listWallet(ctx)
+})
+
+
+
+bot.action('time_cb', async (ctx) => {
+  await ctx.deleteMessage()
+  ctx.telegram.sendMessage(ctx.chat.id, 'Select option time report', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Hour", callback_data: "time_hour_cb"}, {text: "Minute", callback_data: "time_minute_cb"}],
+          [{text: "Back", callback_data: "back_to_main_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+bot.action('balance_change_cb', async (ctx) => {
+  await ctx.deleteMessage()
+  ctx.telegram.sendMessage(ctx.chat.id, 'Select option balance change', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Enable", callback_data: "balance_change_enable_cb"}, {text: "Disable", callback_data: "balance_change_disable_cb"}],
+          [{text: "Back", callback_data: "back_to_main_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+bot.action('balance_report_cb', async (ctx) => {
+  await ctx.deleteMessage()
+  ctx.telegram.sendMessage(ctx.chat.id, 'Select option balance report', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Enable", callback_data: "balance_report_enable_cb"}, {text: "Disable", callback_data: "balance_report_disable_cb"}],
+          [{text: "Back", callback_data: "back_to_main_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+bot.action('back_to_main_menu_cb', async (ctx) => {
+  await ctx.deleteMessage()
+  backToMenu(ctx)
+})
+
+function backToMenu(ctx) {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Select option', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Wallet", callback_data: "wallet_cb"}, {text: "Time", callback_data: "time_cb"}],
+          [{text: "Balance change", callback_data: "balance_change_cb"}, {text: "Balance report", callback_data: "balance_report_cb"}]
+        ]
+      }
+    }
+  )
+}
+
+function backToWalletMenu(ctx) {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Select option', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Add", callback_data: "wallet_add_cb"}, {text: "Update", callback_data: "wallet_update_cb"}],
+          [{text: "Delete", callback_data: "wallet_delete_cb"}, {text: "List", callback_data: "wallet_list_cb"}],
+          [{text: "Back", callback_data: "back_to_main_menu_cb"}]
+        ]
+      }
+    }
+  )
+}
 
 bot.on(message('text'), async (ctx) => {
+  let value
+  try {
+    value = await redisClient.get(`${ctx.message.chat.id}`)
+  } catch (e) {
+    console.log(e)
+  }
+  try {
+    if (value == 'add') {
+      const res = await addWallet(ctx)
+      if (res) {
+        redisClient.del(`${ctx.message.chat.id}`)
+        backToWalletMenu(ctx)
+      } else {
+        ctx.telegram.sendMessage(ctx.message.chat.id, 'Add wallet: \n {Name}/{api_key}/{secret_key} \n', 
+          {
+            reply_markup: {
+              inline_keyboard: [
+                [{text: "Back", callback_data: "back_to_wallet_menu_cb"}]
+              ]
+            }
+          }
+        )
+      }
+    }
+  } catch (e) {
+    console.log(e)
+  }
+})
+
+
+bot.help((ctx) => ctx.reply("Send me a sticker"));
+
+/* bot.on(message('text'), async (ctx) => {
   try {
     const chatId = ctx.message.chat.id
     console.log(ctx)
@@ -85,7 +263,7 @@ bot.on(message('text'), async (ctx) => {
     console.log(e)
     return
   }
-})
+}) */
 
 async function enableBalance(ctx) {
   const chatId = ctx.message.chat.id
@@ -97,6 +275,18 @@ async function enableBalance(ctx) {
     ctx.telegram.sendMessage(chatId, 'Thất bại: ' + res.message)
   }
 }
+
+bot.command('custom', async (ctx) => {
+  return await ctx.reply('Custom buttons keyboard', Markup
+    .keyboard([
+      ['🔍 Search', '😎 Popular'], // Row1 with 2 buttons
+      ['☸ Setting', '📞 Feedback'], // Row2 with 2 buttons
+      ['📢 Ads', '⭐️ Rate us', '👥 Share'] // Row3 with 3 buttons
+    ])
+    .oneTime()
+    .resize()
+  )
+})
 
 async function disableBalance(ctx) {
   const chatId = ctx.message.chat.id
@@ -132,19 +322,23 @@ async function disableBalanceChange(ctx) {
 }
 
 async function addWallet(ctx) {
-  const chatId = ctx.message.chat.id
-  const strings = ctx.message.text.split('/')
-  const wallet = {
-    name: strings[2],
-    api_key: strings[3],
-    api_secret: strings[4]
-  }
-  const res = await coinService.addWalletFromBot(wallet)
-  if (res.status) {
-    ctx.telegram.sendMessage(chatId, 'Thành công')
-  } else {
-    ctx.telegram.sendMessage(chatId, 'Thất bại: ' + res.message)
-  }
+  return new Promise(async function(resolve, reject) {
+    const chatId = ctx.message.chat.id
+    const strings = ctx.message.text.split('/')
+    const wallet = {
+      name: strings[1],
+      api_key: strings[2],
+      api_secret: strings[3]
+    }
+    const res = await coinService.addWalletFromBot(wallet)
+    if (res.status) {
+      await ctx.telegram.sendMessage(chatId, 'Thành công')
+      return resolve(true)
+    } else {
+      await ctx.telegram.sendMessage(chatId, 'Thất bại: ' + res.message)
+      return resolve(false)
+    }
+  })
 }
 
 async function deleteWallet(ctx) {
@@ -202,7 +396,7 @@ async function updateTimeMinute(ctx) {
 
 async function listWallet(ctx) {
   console.log('list')
-  const chatId = ctx.message.chat.id
+  const chatId = ctx.chat.id
   const res = await coinService.listWalletFromBot()
   console.log('status', res.wallets)
   if (res.status) {

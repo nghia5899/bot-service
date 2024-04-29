@@ -1,11 +1,12 @@
 const cronJob = require('cron')
 const coinService = require('./coin-service')
 const { Wallet } = require('../models/wallet')
+const { Bot } = require('../models/bot')
 const botLoggerService = require('../bot/bot-logger-service');
 const botLoggerServiceGuest = require('../bot/bot-logger-service-guest');
 
 let jobGetBalance = new cronJob.CronJob({
-  cronTime: '*/20 * * * * *', 
+  cronTime: ' 30 */1 * * *', 
   onTick: async function() {
     console.log(`Time - ${getTime().toLocaleLowerCase()}`)
     handleGetBalance()
@@ -22,6 +23,22 @@ let jobGetHistory = new cronJob.CronJob({
     } catch (e) {
       console.log(e)
     }
+  },
+  timeZone: 'Asia/Ho_Chi_Minh'
+})
+
+let jobGetIdChat = new cronJob.CronJob({
+  cronTime: '  */1 * * * *', 
+  onTick: async function() {
+    console.log(`Time - ${getTime().toLocaleLowerCase()}`)
+    botLoggerService.listenChatId('7151582118:AAEbmlcYREs3bnKF6Q0lhYX9JnlhqpA1kxQ')
+    botLoggerServiceGuest.listenChatId('6649320854:AAFv3PT6c3BCNMJHb4bK2nI-bh1y3yBTW4Y')
+    /* await Bot({token: '', idBot: '', status: true}).save()
+    const listBot = await Bot.find({})
+    for (let i = 0; i < listBot.length; i++) {
+      botLoggerService.listenChatId(listBot[i].token)
+      botLoggerServiceGuest.listenChatId(listBot[i].token)
+    } */
   },
   timeZone: 'Asia/Ho_Chi_Minh'
 })
@@ -45,8 +62,8 @@ async function logicJob() {
       }
     }
     if (checkSend) {
-      await botLoggerService.sendMessage(`Total All Wallet Old: ${totalAllWalletOld}`, true)
-      botLoggerService.sendMessage(`Total All Wallet New: ${totalAllWalletNew}`, true)
+      botLoggerService.sendMessage(`Total All Wallet Old: ${totalAllWalletOld} \nTotal All Wallet New: ${totalAllWalletNew}`, true)
+      botLoggerServiceGuest.sendMessage(`Total All Wallet Old: ${totalAllWalletOld} \nTotal All Wallet New: ${totalAllWalletNew}`, true)
     }
   } catch(e) {
     console.log(e)
@@ -72,7 +89,6 @@ let jobController = {
         },
         timeZone: 'Asia/Ho_Chi_Minh'
       })
-
       jobGetBalance.start()
       return {status: true}
     } catch(e) {
@@ -106,8 +122,9 @@ let jobController = {
     console.log('| Start Job Check Balances |')
     console.log('----------------------------')
     try {
-      jobGetBalance.start()
+      /* jobGetBalance.start()
       jobGetHistory.start()
+      jobGetIdChat.start() */
     } catch (e) {
       console.log(e)
     }
@@ -136,10 +153,19 @@ async function handleGetBalance() {
         totalAllWallet += totalBalance['USDT']
       }
     }
+    await sleep(1000)
     botLoggerService.sendMessage(`Total All Wallet: ${totalAllWallet}`, true)
+    await sleep(1000)
+    botLoggerServiceGuest.sendMessage(`Total All Wallet: ${totalAllWallet}`, true)
   } catch (e) {
     console.log(e)
   }
+}
+
+var sleepSetTimeout_ctrl;
+function sleep(ms) {
+  clearInterval(sleepSetTimeout_ctrl);
+  return new Promise(resolve => sleepSetTimeout_ctrl = setTimeout(resolve, ms));
 }
 
 module.exports = jobController

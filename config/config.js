@@ -2,6 +2,7 @@ const API_KEY = process.env.API_KEY
 const API_SECRET = process.env.API_SECRET
 const BOT_TOKEN = process.env.BOT_TOKEN
 const BOT_TOKEN_GUEST = process.env.BOT_TOKEN_GUEST
+const BOT_TOKEN_SERVICE = process.env.BOT_TOKEN_SERVICE
 const LIST_CHAT_ID = [
   '-4194909863',
   '-4117216942'
@@ -17,5 +18,6 @@ module.exports = {
   BOT_TOKEN,
   LIST_CHAT_ID,
   LIST_COIN,
-  BOT_TOKEN_GUEST
+  BOT_TOKEN_GUEST,
+  BOT_TOKEN_SERVICE
 }

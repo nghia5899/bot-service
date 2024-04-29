@@ -308,10 +308,10 @@ const coinService = {
             }
             if (ctx) {
               const chatId = ctx.message.chat.id
-              await ctx.telegram.sendMessage(chatId, messages)
+              ctx.telegram.sendMessage(chatId, messages)
             } else {
               console.log('send')
-              await botLoggerService.sendMessage(messages, wallet.status)
+              botLoggerService.sendMessage(messages, wallet.status)
             }
             return resolve(totalBalance)
           } catch (e) {
@@ -336,6 +336,7 @@ const coinService = {
   
             }
             const balancesFunding = await binanceService.getBalanceFunding(time.serverTime, wallet)
+            console.log(balancesFunding)
             console.log('------ checkBalance ------')
             console.log('-----> Success')
             const listCoinHistory = await Coin.find({idWallet: wallet.id, typeWallet: 'spot'})
@@ -442,7 +443,7 @@ const coinService = {
               totalBalance[coin] = {old: totalOld, new: total}
               if (checkSend) {
                 console.log('vao day')
-                await botLoggerService.sendMessage(messages, wallet.statusChange)
+                botLoggerService.sendMessage(messages, wallet.statusChange)
                 totalBalance.checkSend = true
               }
               return resolve(totalBalance)
@@ -453,146 +454,14 @@ const coinService = {
           }
         })
       },
-      getHistoryDeposit: async function() {
-        await binance.useServerTime();
-        binance.depositHistory(async (error, response) => {
-          console.log('------ getHistoryDeposit ------', wallet.id)
-          if (error) {
-            console.log(error)
-            return
-          }
-          console.log('-----> Success')
-          try {
-            if (error) return console.error(error.body);
-            const listHistory = await History.find({type: 'deposit', idWallet: wallet.id}, {__v: 0 }, {sort: {timeInsert: -1}})
-            //check listHistory empty
-            if (listHistory) {
-              let listNewTransaction = []
-              for (let i = 0; i < response.length; i += 1) {
-                let check = false
-                //check id da ton tai chua
-                for (let j = 0; j < listHistory.length; j ++) {
-                  if (response[i].id == listHistory[j].idTx) {
-                    check = true
-                  }
-                }
-                //chua ton tai add vao list moi
-                if (!check) {
-                  listNewTransaction.push(response[i])
-                }
-              }
-              //xoa data cu thay data moi
-              if (listNewTransaction.length > 0) {
-                for (let i = 0; i < listNewTransaction.length; i += 1) {
-                  try {
-                    let messages = `Wallet: ${wallet.name} \n` + 'Deposit: \n'
-                    messages += 'coin: ' + listNewTransaction[i].coin +'\n'
-                    messages += 'amount: +' + listNewTransaction[i].amount +'\n'
-                    botLoggerService.sendMessage(messages, wallet.status)
-                  } catch (e) {
-                    console.log(e)
-                  }
-                }
-                History.deleteMany({type: 'deposit', idWallet: wallet.id},async function(err) {
-                  console.log(err)
-                  if (err) return
-                  for (let i = 0; i < response.length; i += 1) {
-                    const res = await History({
-                      type: 'deposit',
-                      idTx: response[i].id,
-                      insertTime: response[i].insertTime,
-                      idWallet: wallet.id
-                    }).save()
-                    console.log(res)
-                  }
-                })
-              }
-            } else {
-              for (let i = 0; i < response.length; i += 1) {
-                const res = History({
-                  type: 'deposit',
-                  idTx: response[i].id,
-                  insertTime: response[i].insertTime,
-                  idWallet: wallet.id
-                }).save()
-              }
-            }
-          }  catch(e) {
-            console.log(e)
-          }
-        },
-          {
-            offset: 0,
-            limit: 10,
-          }
-        )
-      },
-      getHistoryWithdraw: async function() {
-        await binance.useServerTime();
-        binance.withdrawHistory(async (error, response) => {
-          console.log('------ getHistoryWithdraw ------', wallet.id)
-          if (error) {
-            console.log(error)
-            return
-          }
-          console.log('-----> Success')
-          try {
-            const listHistory = await History.find({type: 'withdraw', idWallet: wallet.id}, {__v: 0 }, {sort: {timeInsert: -1}})
-            //check listHistory empty
-            if (listHistory && listHistory.length != 0) {
-              let listNewTransaction = []
-              for (let i = 0; i < response.length; i += 1) {
-                let check = false
-                //check id da ton tai chua
-                for (let j = 0; j < listHistory.length; j += 1) {
-                  if (response[i].id == listHistory[j].idTx) {
-                    check = true
-                  }
-                }
-                //chua ton tai add vao list moi
-                if (!check && response[i].status == 6) {
-                  listNewTransaction.push(response[i])
-                }
-              }
-              //xoa data cu thay data moi
-              if (listNewTransaction.length > 0) {
-                for (let i = 0; i < listNewTransaction.length; i += 1) {
-                  let messages =  `Wallet: ${wallet.name} \n` +'Withdraw: \n'
-                  messages += 'coin: ' + listNewTransaction[i].coin +'\n'
-                  messages += 'amount: -' + listNewTransaction[i].amount +'\n'
-                  botLoggerService.sendMessage(messages, wallet.status)
-                }
-                History.deleteMany({type: 'withdraw', idWallet: wallet.id}, function(err) {
-                  if (err) return
-                  for (let i = 0; i < response.length; i += 1) {
-                    History({
-                      type: 'withdraw',
-                      idTx: response[i].id,
-                      insertTime: Date.parse(response[i].completeTime),
-                      idWallet: wallet.id
-                    }).save()
-                  }
-                })
-              }
-            } else {
-              for (let i = 0; i < response.length; i += 1) {
-                History({
-                  type: 'withdraw',
-                  idTx: response[i].id,
-                  insertTime: response[i].insertTime,
-                  idWallet: wallet.id
-                }).save()
-              }
-            }
-          } catch (e) {
-            console.log(e)
-          }
-        },
-        {
-          offset: 0,
-          limit: 10
+      getBalanceWallet: async function() {
+        try {
+          const time = await binance.useServerTime();
+          const balances = await binanceService.getBalanceFunding(time.serverTime, wallet)
+          console.log(balances)
+        } catch (e) {
+
         }
-        ) 
       }
     }
   },
@@ -617,7 +486,5 @@ function MarketData(market) {
     price: market.price,
   })
 }
-
-
 
 module.exports = coinService

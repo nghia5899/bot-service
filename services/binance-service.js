@@ -16,6 +16,43 @@ let binanceService = {
       //console.log(e)
       return false
     }
+  },
+  async getBalanceWallet(time, wallet) {
+    try {
+      let query = `timestamp=${time}&recvWindow=60000`
+      const sig = signature(query, wallet)
+      query += `&signature=${sig}`
+      console.log('getBalanceWallet')
+      const res = await callApiBinanceGet('https://api.binance.com/sapi/v1/asset/wallet/balance', query, wallet)
+      if (res) return res.data || []
+    } catch (e) {
+      console.log(e)
+      return false
+    }
+  },
+  async getBalanceEarn(time, wallet) {
+    try {
+      let query = `timestamp=${time}&recvWindow=60000`
+      const sig = signature(query, wallet)
+      query += `&signature=${sig}`
+      console.log('getBalanceWallet')
+      const res = await callApiBinanceGet('https://api.binance.com/sapi/v1/simple-earn/account', query, wallet)
+      if (res) return res.data || []
+    } catch (e) {
+      console.log(e)
+      return false
+    }
+  },
+  async getAvgBtc(time, wallet) {
+    try {
+      console.log('getBalanceWallet')
+      const query = `symbol=BTCUSDT`
+      const res = await callApiBinanceGet('https://api.binance.com/api/v3/avgPrice', query, wallet)
+      if (res) return res.data || []
+    } catch (e) {
+      console.log(e)
+      return false
+    }
   }  
 }
 
@@ -31,6 +68,23 @@ function callApiBinance(url, query, wallet) {
       }
     })
     instance.post(url + '?' + data)
+      .then(response => {
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
+  })
+}
+
+function callApiBinanceGet(url, query, wallet) {
+  return new Promise((resolve, reject) => {
+    console.log(config.API_KEY)
+    const instance = axios.create({
+      headers: {
+        'X-MBX-APIKEY': wallet.api_key,
+      }
+    })
+    instance.get(url + '?' + query)
       .then(response => {
         resolve(response)
       }).catch(error => {
