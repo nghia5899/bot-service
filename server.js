@@ -13,7 +13,7 @@ const config = require('./config/config')
 const {Config } = require('./models/config')
 const Binance = require('node-binance-api');
 
-const port = 3005;
+const port = 3006;
 
 require('./config/init-mongodb')
 
@@ -31,8 +31,7 @@ route(app);
 
 initConfig()
 
-
-//jobService.startJobGetBalances()
+jobService.startJobGetBalances()
 
 //bot.listenChatId('6649320854:AAFv3PT6c3BCNMJHb4bK2nI-bh1y3yBTW4Y')
 

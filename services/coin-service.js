@@ -8,6 +8,7 @@ const botLoggerService = require('../bot/bot-logger-service');
 const { Config } = require('../models/config');
 const { list } = require('pm2');
 const { resolve } = require('path');
+const { match } = require('assert');
 
 const binance = new Binance().options({
   APIKEY: config.API_KEY,
@@ -222,6 +223,7 @@ const coinService = {
             const time = await binance.useServerTime();
             let balances
             let balancesFunding
+            let balancesEarn
             try {
               balances = await binance.balance()
             } catch (e) {
@@ -229,6 +231,11 @@ const coinService = {
             }
             try {
               balancesFunding = await binanceService.getBalanceFunding(time.serverTime, wallet)
+            } catch (e) {
+  
+            }
+            try {
+              balancesEarn = await binanceService.getBalanceEarn(time.serverTime, wallet)
             } catch (e) {
   
             }
@@ -243,7 +250,7 @@ const coinService = {
               if (balances) {
                 const coinData = await Coin.findOne({code: coin, idWallet: wallet.id, typeWallet: 'spot'})
                 messages += '-Spot: ' + Math.floor(balances[coin].available) + '\n'
-                total += parseFloat(balances[coin].available)
+                total += Math.floor(parseFloat(balances[coin].available))
                 if (coinData) {
                   let update = {
                     amount: balances[coin].available
@@ -279,8 +286,8 @@ const coinService = {
                       }).save()
                     }
                   } else {
-                    messages += '-Funding: ' + asset.free + '\n'
-                    total += parseFloat(asset.free)
+                    messages += '-Funding: ' + Math.floor(parseFloat(asset.free)) + '\n'
+                    total += Math.floor(parseFloat(asset.free))
                     if (coinDataFunding) {
                       let update = {
                         amount: asset.free
@@ -303,10 +310,35 @@ const coinService = {
               } else {
                 messages += '-Funding: 0' + '\n'
               }
+
+              if (balancesEarn) {
+                const coinDataEarn = await Coin.findOne({code: coin, idWallet: wallet.id, typeWallet: 'earn'})
+                messages += '-Earn: ' + Math.floor(parseFloat(balancesEarn.totalAmountInUSDT)) + '\n'
+                total += Math.floor(parseFloat(balancesEarn.totalAmountInUSDT))
+                if (coinDataEarn) {
+                  let update = {
+                    amount: balancesEarn.totalAmountInUSDT
+                  }
+                  Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'spot'}, update, function(err) {
+                    if (err) console.log(err)
+                  })
+                } else {
+                  Coin({
+                    idWallet: wallet.id,
+                    typeWallet: 'earn',
+                    code: coin,
+                    amount: balancesEarn.totalAmountInUSDT,
+                  }).save()
+                }
+              } else {
+                messages += '-Earn: 0' + '\n'
+              }
+
               messages += '-Total: ' + total + '\n'
               totalBalance[coin] = total
             }
             if (ctx) {
+              console.log(ctx)
               const chatId = ctx.message.chat.id
               ctx.telegram.sendMessage(chatId, messages)
             } else {
@@ -330,17 +362,29 @@ const coinService = {
             const time = await binance.useServerTime();
             const listCoin = config.LIST_COIN
             let balances
+            let balancesFunding
+            let balancesEarn
             try {
               balances = await binance.balance()
             } catch (e) {
   
             }
-            const balancesFunding = await binanceService.getBalanceFunding(time.serverTime, wallet)
-            console.log(balancesFunding)
+
+            try {
+              balancesFunding = await binanceService.getBalanceFunding(time.serverTime, wallet)
+            } catch (e) {
+  
+            }
+            try {
+              balancesEarn = await binanceService.getBalanceEarn(time.serverTime, wallet)
+            } catch (e) {
+  
+            }
             console.log('------ checkBalance ------')
             console.log('-----> Success')
             const listCoinHistory = await Coin.find({idWallet: wallet.id, typeWallet: 'spot'})
             const listCoinHistoryFunding = await Coin.find({idWallet: wallet.id, typeWallet: 'funding'})
+            const listCoinHistoryEarn = await Coin.find({idWallet: wallet.id, typeWallet: 'earn'})
             let messages = `Wallet: ${wallet.name} \n` + 'Balance change: \n'
             for (let i = 0; i < listCoin.length; i += 1) {
               const coin = listCoin[i]
@@ -411,8 +455,8 @@ const coinService = {
                     }
                   }
                   messages += '-Type: Funding' +'\n'
-                  messages += '-OldAmount: ' + oldBalanceFunding +'\n'
-                  messages += '-NewAmount: ' + newAmount +'\n'
+                  messages += '+OldAmount: ' + oldBalanceFunding +'\n'
+                  messages += '+NewAmount: ' + newAmount +'\n'
                   totalOld += oldBalanceFunding
                   total += parseFloat(newAmount)
                   if (check) {
@@ -435,11 +479,59 @@ const coinService = {
                   }
                 }
                 messages += '-Type: Funding' +'\n'
-                messages += '-OldAmount: ' + oldBalanceFunding +'\n'
-                messages += '-NewAmount: ' + oldBalanceFunding+'\n'
+                messages += '+OldAmount: ' + oldBalanceFunding +'\n'
+                messages += '+NewAmount: ' + oldBalanceFunding+'\n'
+              }
+
+              let oldBalanceEarn = 0
+              if (balancesEarn) {
+                try {
+                  let check = false
+                  for (let j = 0; j < listCoinHistoryEarn.length; j++) {
+                    if (coin == listCoinHistoryEarn[j].code) {
+                      oldBalanceEarn = listCoinHistoryEarn[j].amount
+                      console.log('11111111111')
+                      console.log(parseFloat(balancesEarn.totalAmountInUSDT))
+                      console.log(parseFloat(oldBalanceEarn))
+                      console.log(parseFloat(balancesEarn.totalAmountInUSDT) - parseFloat(oldBalanceEarn) >= 2 || (parseFloat(balancesEarn.totalAmountInUSDT) - parseFloat(oldBalanceEarn)) * -1 >= 2)
+                      if (parseFloat(balancesEarn.totalAmountInUSDT) - parseFloat(oldBalanceEarn) >= 2 || (parseFloat(balancesEarn.totalAmountInUSDT) - parseFloat(oldBalanceEarn)) * -1 >= 2) {
+                        check = true
+                        break
+                      }
+                    }
+                  }
+                  messages += '+Type: Earn' +'\n'
+                  messages += '+OldAmount: ' + Math.floor(parseFloat(oldBalanceEarn)) +'\n'
+                  messages += '+NewAmount: ' + Math.floor(parseFloat(balancesEarn.totalAmountInUSDT)) +'\n'
+                  totalOld += oldBalanceEarn
+                  total += parseFloat(balancesEarn.totalAmountInUSDT)
+                  if (check) {
+                    checkSend = true
+                    let update = {
+                      amount: parseFloat(balancesEarn.totalAmountInUSDT)
+                    }
+                    Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'earn'}, update,{ new: true}, function(err) {
+                      if (err) console.log(err)
+                    })
+                  }
+                } catch (e) {
+                  console.log(e)
+                }
+              } else {
+                for (let j = 0; j < listCoinHistoryEarn.length; j++) {
+                  if (coin == listCoinHistoryEarn[j].code) {
+                    oldBalanceEarn = listCoinHistoryEarn[j].amount
+                    break
+                  }
+                }
+                messages += 'Coin: ' + coin +'\n'
+                messages += '-Type: Earn' +'\n'
+                messages += '-OldAmount: ' + Math.floor(parseFloat(oldBalanceEarn)) +'\n'
+                messages += '-NewAmount: ' + Math.floor(parseFloat(oldBalanceEarn)) +'\n'
               }
   
-              messages += 'Total: ' + total + '\n'
+              messages += 'Total: ' + Math.floor(total) + '\n'
+              console.log(messages)
               totalBalance[coin] = {old: totalOld, new: total}
               if (checkSend) {
                 console.log('vao day')

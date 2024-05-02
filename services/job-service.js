@@ -6,7 +6,7 @@ const botLoggerService = require('../bot/bot-logger-service');
 const botLoggerServiceGuest = require('../bot/bot-logger-service-guest');
 
 let jobGetBalance = new cronJob.CronJob({
-  cronTime: ' 30 */1 * * *', 
+  cronTime: ' 30 */2 * * *', 
   onTick: async function() {
     console.log(`Time - ${getTime().toLocaleLowerCase()}`)
     handleGetBalance()
@@ -62,8 +62,8 @@ async function logicJob() {
       }
     }
     if (checkSend) {
-      botLoggerService.sendMessage(`Total All Wallet Old: ${totalAllWalletOld} \nTotal All Wallet New: ${totalAllWalletNew}`, true)
-      botLoggerServiceGuest.sendMessage(`Total All Wallet Old: ${totalAllWalletOld} \nTotal All Wallet New: ${totalAllWalletNew}`, true)
+      botLoggerService.sendMessage(`Total All Wallet Old: ${Math.floor(totalAllWalletOld)} \nTotal All Wallet New: ${Math.floor(totalAllWalletNew)}`, true)
+      botLoggerServiceGuest.sendMessage(`Total All Wallet Old: ${Math.floor(totalAllWalletOld)} \nTotal All Wallet New: ${Math.floor(totalAllWalletNew)}`, true)
     }
   } catch(e) {
     console.log(e)
@@ -122,9 +122,9 @@ let jobController = {
     console.log('| Start Job Check Balances |')
     console.log('----------------------------')
     try {
-      /* jobGetBalance.start()
+      jobGetBalance.start()
       jobGetHistory.start()
-      jobGetIdChat.start() */
+      jobGetIdChat.start()
     } catch (e) {
       console.log(e)
     }

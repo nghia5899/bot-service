@@ -3,7 +3,7 @@ const jobService = require('../services/job-service.js')
 const { Telegraf, Markup } = require('telegraf')
 const config = require('../config/config.js')
 const PATH = require('path')
-const bot = new Telegraf('6518426353:AAEkUtoRsydeUZ7HlRIIXQEvVDHybQtdNHs')
+const bot = new Telegraf(config.BOT_TOKEN)
 const {message } = require('telegraf/filters')
 const { Wallet } = require('../models/wallet')
 const { Chat } = require('../models/chat')
@@ -24,7 +24,7 @@ bot.action('wallet_cb', async (ctx) => {
         inline_keyboard: [
           [{text: "Add", callback_data: "wallet_add_cb"}, {text: "Update", callback_data: "wallet_update_cb"}],
           [{text: "Delete", callback_data: "wallet_delete_cb"}, {text: "List", callback_data: "wallet_list_cb"}],
-          [{text: "Back", callback_data: "back_to_main_menu_cb"}]
+          [{text: "Report now", callback_data: "report_now_cb"}, {text: "Back", callback_data: "back_to_main_menu_cb"}]
         ]
       }
     }
@@ -35,11 +35,18 @@ bot.action('back_to_wallet_menu_cb', async (ctx) => {
   backToWalletMenu(ctx)
 })
 
+bot.action('report_now_cb',  async (ctx) => {
+  try {
+    report(ctx)
+  } catch (e) {
+    console.log(e)
+  }
+})
+
+
 bot.action('wallet_add_cb',  async (ctx) => {
   try {
-    console.log(ctx.chat.id)
-    await redisClient.set(`${ctx.chat.id}`, 'add')
-    ctx.telegram.sendMessage(ctx.chat.id, 'Add wallet: \n {Name}/{api_key}/{secret_key} \n', 
+    ctx.telegram.sendMessage(ctx.chat.id, 'Add wallet: \n wallet/add/{Name}/{api_key}/{secret_key} \n', 
       {
         reply_markup: {
           inline_keyboard: [
@@ -54,7 +61,7 @@ bot.action('wallet_add_cb',  async (ctx) => {
 })
 
 bot.action('wallet_update_cb',  async (ctx) => {
-  ctx.telegram.sendMessage(ctx.chat.id, 'Add wallet: \n {Name}/{api_key}/{secret_key} \n', 
+  ctx.telegram.sendMessage(ctx.chat.id, 'Update wallet: \n wallet/update/{id}/{name}/{api key}/{secret_key} \n', 
     {
       reply_markup: {
         inline_keyboard: [
@@ -66,7 +73,7 @@ bot.action('wallet_update_cb',  async (ctx) => {
 })
 
 bot.action('wallet_delete_cb',  async (ctx) => {
-  ctx.telegram.sendMessage(ctx.chat.id, 'Add wallet: \n {Name}/{api_key}/{secret_key} \n', 
+  ctx.telegram.sendMessage(ctx.chat.id, 'Delete wallet: \n wallet/delete/{id} \n', 
     {
       reply_markup: {
         inline_keyboard: [
@@ -97,6 +104,36 @@ bot.action('time_cb', async (ctx) => {
   )
 })
 
+bot.action('back_to_time_menu_cb', async (ctx) => {
+  backToTimeMenu(ctx)
+})
+
+bot.action('time_minute_cb', async (ctx) => {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Update time minute wallet: \n time/minute/{thời gian} \n', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Back", callback_data: "back_to_time_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+bot.action('time_hour_cb', async (ctx) => {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Update time hour wallet: \n time/hour/{thời gian} \n', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Back", callback_data: "back_to_time_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+
+
 bot.action('balance_change_cb', async (ctx) => {
   await ctx.deleteMessage()
   ctx.telegram.sendMessage(ctx.chat.id, 'Select option balance change', 
@@ -111,6 +148,35 @@ bot.action('balance_change_cb', async (ctx) => {
   )
 })
 
+bot.action('back_to_balance_change_menu_cb', async (ctx) => {
+  backToTimeMenu(ctx)
+})
+
+bot.action('balance_change_enable_cb', async (ctx) => {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Enable balance change: \n {id}/balanceChange/enable \n', 
+  {
+    reply_markup: {
+      inline_keyboard: [
+        [{text: "Back", callback_data: "back_to_balance_change_menu_cb"}]
+      ]
+    }
+  }
+)
+})
+
+bot.action('balance_change_disable_cb', async (ctx) => {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Disable balance change wallet: \n {id}/balanceChange/disable \n', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Back", callback_data: "back_to_balance_change_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+
 bot.action('balance_report_cb', async (ctx) => {
   await ctx.deleteMessage()
   ctx.telegram.sendMessage(ctx.chat.id, 'Select option balance report', 
@@ -119,6 +185,34 @@ bot.action('balance_report_cb', async (ctx) => {
         inline_keyboard: [
           [{text: "Enable", callback_data: "balance_report_enable_cb"}, {text: "Disable", callback_data: "balance_report_disable_cb"}],
           [{text: "Back", callback_data: "back_to_main_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+bot.action('back_to_balance_report_menu_cb', async (ctx) => {
+  backToTimeMenu(ctx)
+})
+
+bot.action('balance_report_enable_cb', async (ctx) => {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Enable balance report: \n {id}/balance/enable \n', 
+  {
+    reply_markup: {
+      inline_keyboard: [
+        [{text: "Back", callback_data: "back_to_balance_report_menu_cb"}]
+      ]
+    }
+  }
+)
+})
+
+bot.action('balance_report_disable_cb', async (ctx) => {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Disable balance report: \n {id}/balance/disable \n', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Back", callback_data: "back_to_balance_report_menu_cb"}]
         ]
       }
     }
@@ -157,7 +251,46 @@ function backToWalletMenu(ctx) {
   )
 }
 
-bot.on(message('text'), async (ctx) => {
+function backToTimeMenu(ctx) {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Select option time report', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Hour", callback_data: "time_hour_cb"}, {text: "Minute", callback_data: "time_minute_cb"}],
+          [{text: "Back", callback_data: "back_to_main_menu_cb"}]
+        ]
+      }
+    }
+  )
+}
+
+function backToBalanceChangeMenu(ctx) {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Select option balance change', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Enable", callback_data: "balance_change_enable_cb"}, {text: "Disable", callback_data: "balance_change_disable_cb"}],
+          [{text: "Back", callback_data: "back_to_main_menu_cb"}]
+        ]
+      }
+    }
+  )
+}
+
+function backToBalanceReportMenu(ctx) {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Select option balance report', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Enable", callback_data: "balance_report_enable_cb"}, {text: "Disable", callback_data: "balance_report_disable_cb"}],
+          [{text: "Back", callback_data: "back_to_main_menu_cb"}]
+        ]
+      }
+    }
+  )
+}
+
+/* bot.on(message('text'), async (ctx) => {
   let value
   try {
     value = await redisClient.get(`${ctx.message.chat.id}`)
@@ -186,11 +319,11 @@ bot.on(message('text'), async (ctx) => {
     console.log(e)
   }
 })
-
+ */
 
 bot.help((ctx) => ctx.reply("Send me a sticker"));
 
-/* bot.on(message('text'), async (ctx) => {
+bot.on(message('text'), async (ctx) => {
   try {
     const chatId = ctx.message.chat.id
     console.log(ctx)
@@ -263,7 +396,7 @@ bot.help((ctx) => ctx.reply("Send me a sticker"));
     console.log(e)
     return
   }
-}) */
+})
 
 async function enableBalance(ctx) {
   const chatId = ctx.message.chat.id
@@ -326,9 +459,9 @@ async function addWallet(ctx) {
     const chatId = ctx.message.chat.id
     const strings = ctx.message.text.split('/')
     const wallet = {
-      name: strings[1],
-      api_key: strings[2],
-      api_secret: strings[3]
+      name: strings[2],
+      api_key: strings[3],
+      api_secret: strings[4]
     }
     const res = await coinService.addWalletFromBot(wallet)
     if (res.status) {
@@ -422,12 +555,12 @@ async function report(ctx) {
     const listWallet = await Wallet.find()
     for (let j = 0; j < listWallet.length; j++) {
       const binnaceObj = coinService.BinaceOption(listWallet[j])
-      const totalBalance = await binnaceObj.getBalance(ctx)
+      const totalBalance = await binnaceObj.getBalance({message: {chat: {id: ctx.chat.id}}, telegram: ctx.telegram})
       if (listWallet[j].status) {
         totalAllWallet += totalBalance['USDT']
       }
     }
-    const chatId = ctx.message.chat.id
+    const chatId = ctx.chat.id
     ctx.telegram.sendMessage(chatId,`Total All Wallet: ${totalAllWallet}`)
   } catch (e) {
     console.log(e)
