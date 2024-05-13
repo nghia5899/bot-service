@@ -123,8 +123,8 @@ let jobController = {
     console.log('----------------------------')
     try {
       jobGetBalance.start()
-      jobGetHistory.start()
-      jobGetIdChat.start()
+      /* jobGetHistory.start()
+      jobGetIdChat.start() */
     } catch (e) {
       console.log(e)
     }

@@ -226,19 +226,13 @@ const coinService = {
             let balancesEarn
             try {
               balances = await binance.balance()
-            } catch (e) {
-  
-            }
+            } catch (e) {}
             try {
               balancesFunding = await binanceService.getBalanceFunding(time.serverTime, wallet)
-            } catch (e) {
-  
-            }
+            } catch (e) {}
             try {
               balancesEarn = await binanceService.getBalanceEarn(time.serverTime, wallet)
-            } catch (e) {
-  
-            }
+            } catch (e) {}
             console.log('------ getBalance ------')
             console.log('-----> Success')
             let messages = `Name: ${wallet.name} \n` + 'Balances: \n'
@@ -319,7 +313,7 @@ const coinService = {
                   let update = {
                     amount: balancesEarn.totalAmountInUSDT
                   }
-                  Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'spot'}, update, function(err) {
+                  Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'earn'}, update, function(err) {
                     if (err) console.log(err)
                   })
                 } else {
@@ -366,20 +360,13 @@ const coinService = {
             let balancesEarn
             try {
               balances = await binance.balance()
-            } catch (e) {
-  
-            }
-
+            } catch (e) {}
             try {
               balancesFunding = await binanceService.getBalanceFunding(time.serverTime, wallet)
-            } catch (e) {
-  
-            }
+            } catch (e) {}
             try {
               balancesEarn = await binanceService.getBalanceEarn(time.serverTime, wallet)
-            } catch (e) {
-  
-            }
+            } catch (e) {}
             console.log('------ checkBalance ------')
             console.log('-----> Success')
             const listCoinHistory = await Coin.find({idWallet: wallet.id, typeWallet: 'spot'})
