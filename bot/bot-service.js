@@ -1,4 +1,5 @@
 const coinService = require('../services/coin-service')
+const walletService = require('../services/wallet-service')
 const jobService = require('../services/job-service.js')
 const { Telegraf, Markup } = require('telegraf')
 const config = require('../config/config.js')
@@ -13,8 +14,6 @@ const redisClient = require('../config/redis.js');
 bot.start( async (ctx) => {
   backToMenu(ctx)
 })
-
-bot.webhookCallback
 
 bot.action('wallet_cb', async (ctx) => {
   await ctx.deleteMessage()
@@ -219,6 +218,92 @@ bot.action('balance_report_disable_cb', async (ctx) => {
   )
 })
 
+//wallet trx
+bot.action('wallet_trx_cb', async (ctx) => {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Select option', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Add", callback_data: "wallet_trx_add_cb"}, {text: "Update", callback_data: "wallet_trx_update_cb"}],
+          [{text: "Delete", callback_data: "wallet_trx_delete_cb"}, {text: "List", callback_data: "wallet_trx_list_cb"}],
+          [{text: "Report now", callback_data: "wallet_trx_report_now_cb"}, {text: "Back", callback_data: "back_to_main_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+bot.action('wallet_trx_add_cb',  async (ctx) => {
+  try {
+    ctx.telegram.sendMessage(ctx.chat.id, 'Add wallet: \n wallet_trx/add/{Name}/{address} \n', 
+      {
+        reply_markup: {
+          inline_keyboard: [
+            [{text: "Back", callback_data: "back_to_wallet_trx_menu_cb"}]
+          ]
+        }
+      }
+    )
+  } catch (e) {
+    console.log(e)
+  }
+})
+
+bot.action('wallet_trx_update_cb',  async (ctx) => {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Update wallet: \n wallet_trx/update/{id}/{name}/{address} \n', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Back", callback_data: "back_to_wallet_trx_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+bot.action('wallet_trx_delete_cb',  async (ctx) => {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Delete wallet: \n wallet_trx/delete/{id} \n', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Back", callback_data: "back_to_wallet_trx_menu_cb"}]
+        ]
+      }
+    }
+  )
+})
+
+bot.action('wallet_trx_report_now_cb',  async (ctx) => {
+  try {
+    reportWalletTrx(ctx)
+  } catch (e) {
+    console.log(e)
+  }
+})
+
+bot.action('wallet_trx_list_cb',  async (ctx) => {
+  listWalletTrx(ctx)
+})
+
+
+bot.action('back_to_wallet_trx_menu_cb', async (ctx) => {
+  backToWalletTrxMenu(ctx)
+})
+
+function backToWalletTrxMenu(ctx) {
+  ctx.telegram.sendMessage(ctx.chat.id, 'Select option', 
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{text: "Add", callback_data: "wallet_trx_add_cb"}, {text: "Update", callback_data: "wallet_trx_update_cb"}],
+          [{text: "Delete", callback_data: "wallet_trx_delete_cb"}, {text: "List", callback_data: "wallet_trx_list_cb"}],
+          [{text: "Report now", callback_data: "wallet_trx_report_now_cb"}, {text: "Back", callback_data: "back_to_main_menu_cb"}]
+        ]
+      }
+    }
+  )
+}
+
 bot.action('back_to_main_menu_cb', async (ctx) => {
   await ctx.deleteMessage()
   backToMenu(ctx)
@@ -230,7 +315,8 @@ function backToMenu(ctx) {
       reply_markup: {
         inline_keyboard: [
           [{text: "Wallet", callback_data: "wallet_cb"}, {text: "Time", callback_data: "time_cb"}],
-          [{text: "Balance change", callback_data: "balance_change_cb"}, {text: "Balance report", callback_data: "balance_report_cb"}]
+          [{text: "Balance change", callback_data: "balance_change_cb"}, {text: "Balance report", callback_data: "balance_report_cb"}],
+          [{text: "Wallet USDT-TRC20", callback_data: "wallet_trx_cb"}]
         ]
       }
     }
@@ -346,7 +432,20 @@ bot.on(message('text'), async (ctx) => {
         ctx.telegram.sendMessage(chatId, 'Định dạng không đúng')
         return
       }
-    }  else if (ctx.message.text.match(/wallet/)) {
+    } else if (ctx.message.text.match(/wallet_trx/)) {
+      if (ctx.message.text.match(/add/)) {
+        return addWalletTrx(ctx)
+      } else if (ctx.message.text.match(/delete/)) {
+        return deleteWalletTrx(ctx)
+      } else if (ctx.message.text.match(/update/)) {
+        return updateWalletTrx(ctx)
+      }  else if (ctx.message.text.match(/list/)) {
+        return listWalletTrx(ctx)
+      } else {
+        ctx.telegram.sendMessage(chatId, 'Định dạng không đúng')
+        return
+      }
+    } else if (ctx.message.text.match(/wallet/)) {
       if (ctx.message.text.match(/add/)) {
         return addWallet(ctx)
       } else if (ctx.message.text.match(/delete/)) {
@@ -361,7 +460,7 @@ bot.on(message('text'), async (ctx) => {
         ctx.telegram.sendMessage(chatId, 'Định dạng không đúng')
         return
       }
-    }  else if (ctx.message.text.match(/time/)) {
+    } else if (ctx.message.text.match(/time/)) {
       if (ctx.message.text.match(/hour/)) {
         return updateTime(ctx)
       } else if (ctx.message.text.match(/minute/)) {
@@ -543,6 +642,7 @@ async function listWallet(ctx) {
       message += "Báo số dư: " +  res.wallets[i].status + '\n'
       message += "Báo biến động: " +  res.wallets[i].statusChange + '\n \n'
     }
+    if (message == '') message = 'Empty'
     ctx.telegram.sendMessage(chatId, message)
   } else {
     ctx.telegram.sendMessage(chatId, 'Thất bại: ' + res.message)
@@ -662,4 +762,89 @@ async function listChat(ctx) {
   }
 }
 
+async function addWalletTrx(ctx) {
+  return new Promise(async function(resolve, reject) {
+    const chatId = ctx.message.chat.id
+    const strings = ctx.message.text.split('/')
+    const wallet = {
+      name: strings[2],
+      address: strings[3],
+    }
+    const res = await walletService.addWalletFromBot(wallet)
+    if (res.status) {
+      await ctx.telegram.sendMessage(chatId, 'Thành công')
+      return resolve(true)
+    } else {
+      await ctx.telegram.sendMessage(chatId, 'Thất bại: ' + res.message)
+      return resolve(false)
+    }
+  })
+}
+
+async function deleteWalletTrx(ctx) {
+  const chatId = ctx.message.chat.id
+  const strings = ctx.message.text.split('/')
+  const wallet = {
+    id: strings[2],
+  }
+  const res = await walletService.deleteWalletFromBot(wallet)
+  if (res.status) {
+    ctx.telegram.sendMessage(chatId, 'Thành công')
+  } else {
+    ctx.telegram.sendMessage(chatId, 'Thất bại: ' + res.message)
+  }
+}
+
+async function updateWalletTrx(ctx) {
+  const chatId = ctx.message.chat.id
+  const strings = ctx.message.text.split('/')
+  const wallet = {
+    id: strings[2],
+    name: strings[3],
+  }
+  if (strings[4]) {
+    wallet.address = strings[4]
+  }
+  const res = await walletService.updateWalletFromBot(wallet)
+  if (res.status) {
+    ctx.telegram.sendMessage(chatId, 'Thành công')
+  } else {
+    ctx.telegram.sendMessage(chatId, 'Thất bại: ' + res.message)
+  }
+}
+
+async function listWalletTrx(ctx) {
+  console.log('list')
+  const chatId = ctx.chat.id
+  const res = await walletService.listWalletFromBot()
+  console.log('status', res.wallets)
+  if (res.status) {
+    let message = ''
+    for (let i = 0; i < res.wallets.length || 0; i++) {
+      console.log('111111111')
+      message += "Id: " +  res.wallets[i]._id + '\n'
+      message += "Name: " +  res.wallets[i].name + '\n'
+      message += "Address: " +  res.wallets[i].address + '\n'
+      message += "Balance: " +  Math.floor(parseFloat(res.wallets[i].balance)) + '\n'
+      message += "Báo số dư: " +  res.wallets[i].status + '\n'
+      message += "Báo biến động: " +  res.wallets[i].statusChange + '\n \n'
+    }
+    if (message == '') message = 'Empty'
+    ctx.telegram.sendMessage(chatId, message)
+  } else {
+    ctx.telegram.sendMessage(chatId, 'Thất bại: ' + res.message)
+  }
+}
+
+async function reportWalletTrx(ctx) {
+  try {
+    let totalAllWallet = 0
+    const listWallet = await Wallet.find()
+    for (let j = 0; j < listWallet.length; j++) {
+      walletService.getBalanceUSDT_TRC20({message: {chat: {id: ctx.chat.id}}, telegram: ctx.telegram})
+    }
+  } catch (e) {
+    console.log(e)
+  }
+}
 bot.launch()

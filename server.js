@@ -38,6 +38,8 @@ jobService.startJobGetBalances()
 
 //jobService.updateTimeBalance(2)
 
+//alletService.checkBalanceUSDT_TRC20()
+
 
 app.listen(port, function() {
     console.log('Node server running @ http://localhost:'+ port + '...')

@@ -1,25 +1,22 @@
 const { Telegraf } = require('telegraf')
 const config = require('../config/config.js')
 const PATH = require('path')
-const bot = new Telegraf(config.BOT_TOKEN)
+const bot = new Telegraf(config.BOT_TOKEN_TRX_WALLET)
 const { Chat } = require('../models/chat')
 const axios = require('axios')
 
-
 module.exports = {
-  getBot: function() {
-    return bot
-  },
   sendMessage: async function(message, enable, chatId) {
     return new Promise(async (resolve, reject) => {
       try {
         if (process.env.IGNORE_TELEGRAM_BOT) return resolve()
-        if (!enable) return resolve()
+        //if (!enable) return resolve()
         if (!bot.botInfo) {
           bot.botInfo = await bot.telegram.getMe()
         }
         const id = bot.botInfo.id
         const listChatId = await Chat.find({idBot: id})
+        console.log(listChatId)
         for (let i = 0; i < listChatId.length; i += 1) {
           console.log(' --- Bot send ---')
           console.info(message)
