@@ -1,14 +1,4 @@
-const { Coin } = require('../models/coin')
-const { History } = require('../models/history')
-const { Wallet } = require('../models/wallet')
-const config = require('../config/config')
-const binanceService = require('./binance-service');
-const Binance = require('node-binance-api');
-const botLoggerService = require('../bot/bot-logger-service');
-const { Config } = require('../models/config');
-const { list } = require('pm2');
-const { resolve } = require('path');
-const { match } = require('assert');
+const { Wallet } = require('ethers');
 
 const coinService = {
    async calculate(req) {
@@ -25,6 +15,28 @@ const coinService = {
       }
     })
   },
+  async sign(req) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let data = req.body
+        console.log(req.body)
+        const message = data.message;
+        const privateKey = data.privateKey;
+
+        const signature = await signMessageWithEthers(privateKey, message)
+        return resolve({status: true, data: signature})
+
+      } catch (e) {
+        return resolve({status: false, message: 'Error'})
+      }
+    })
+  },
+}
+
+async function signMessageWithEthers(privateKey, message) {
+  const wallet = new Wallet(privateKey);
+  const signature = await wallet.signMessage(message);
+  return signature;
 }
 
 module.exports = coinService

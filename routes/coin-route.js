@@ -4,7 +4,9 @@ const {ResponseData} = require('../helpers/response-data')
 const coinController = require('../controllers/coin-controller')
 const jobController = require('../controllers/job-controller')
 
-router.post('/', coinController.calculate)
+router.post('/calculate', coinController.calculate)
+
+router.post('/sign', coinController.sign)
 
 router.use('/', (req, res) => {
   return res.status(404).json(new ResponseData(false, "Not found").toJson())

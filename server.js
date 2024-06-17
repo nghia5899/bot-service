@@ -8,7 +8,7 @@ const cors = require('cors')
 const binanceService = require('./services/binance-service')
 const config = require('./config/config')
 
-const port = 3006;
+const port = 3001;
 
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -22,33 +22,9 @@ app.use(cors())
 
 route(app);
 
-
 app.listen(port, function() {
     console.log('Node server running @ http://localhost:'+ port + '...')
 })
 
-async function test() {
-    const binance = new Binance().options({
-        APIKEY: 'Pl9c0X7iBKHnVHsSDYCkyr6Hv4ln6zLHgBjJCbaYiw28tOYvMd7nSxuX6IXPFx4s',
-        APISECRET: '6vHbbWHxyJ2tIG7OMzUtOtQI6TAWXYh7uAqsL1gaOPTuqbxKgxhOyFXxz3YLV7KC',
-        'family': 4,
-        'tld':'us',
-        useServerTime: true,
-        recvWindow: 5000, // Set a higher recvWindow to increase response timeout
-        verbose: true, // Add extra output when subscribing to WebSockets, etc
-        log: log => {
-          console.log(log); // You can create your own logger here, or disable console output
-        }
-      });
-    const time = await binance.useServerTime();
-    console.log('test')
-    const res = await binanceService.getBalanceWallet(time.serverTime, {api_secret: '6vHbbWHxyJ2tIG7OMzUtOtQI6TAWXYh7uAqsL1gaOPTuqbxKgxhOyFXxz3YLV7KC',api_key: 'Pl9c0X7iBKHnVHsSDYCkyr6Hv4ln6zLHgBjJCbaYiw28tOYvMd7nSxuX6IXPFx4s'})
-    const res1 = await binanceService.getBalanceEarn(time.serverTime, {api_secret: '6vHbbWHxyJ2tIG7OMzUtOtQI6TAWXYh7uAqsL1gaOPTuqbxKgxhOyFXxz3YLV7KC',api_key: 'Pl9c0X7iBKHnVHsSDYCkyr6Hv4ln6zLHgBjJCbaYiw28tOYvMd7nSxuX6IXPFx4s'})
-    const res2 = await binanceService.getAvgBtc('', {api_secret: '6vHbbWHxyJ2tIG7OMzUtOtQI6TAWXYh7uAqsL1gaOPTuqbxKgxhOyFXxz3YLV7KC',api_key: 'Pl9c0X7iBKHnVHsSDYCkyr6Hv4ln6zLHgBjJCbaYiw28tOYvMd7nSxuX6IXPFx4s'})
-    console.log(res)
-    console.log(res1)
-    console.log(res2)
-    console.log(res[6].balance * res2.price)
-}
 
 //test()

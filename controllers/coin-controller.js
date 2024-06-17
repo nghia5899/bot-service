@@ -13,10 +13,13 @@ class CoinController {
     }
   }
   
-  async addWallet(req, res) {
+  async sign(req, res) {
     try {
-      let response = await coinService.addWallet(req)
-      return res.json(new ResponseData(true, "", response).toJson())
+      let response = await coinService.sign(req)
+      if (response.status)
+        return res.json(new ResponseData(true, "", response.data).toJson())
+      else 
+        return res.json(new ResponseData(false, response.message).toJson())
     } catch (e) {
       console.log(e)
       return res.json(new ResponseData(false, e).toJson())
