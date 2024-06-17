@@ -5,17 +5,10 @@ const route = require('./routes/index-routes')
 const path = require('path')
 const app = express();
 const cors = require('cors')
-const coinService = require('./services/coin-service')
 const binanceService = require('./services/binance-service')
-const jobService = require('./services/job-service')
-const bot = require('./bot/bot-service')
 const config = require('./config/config')
-const {Config } = require('./models/config')
-const Binance = require('node-binance-api');
 
 const port = 3006;
-
-require('./config/init-mongodb')
 
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -29,28 +22,10 @@ app.use(cors())
 
 route(app);
 
-initConfig()
-
-jobService.startJobGetBalances()
-
-//bot.listenChatId('6649320854:AAFv3PT6c3BCNMJHb4bK2nI-bh1y3yBTW4Y')
-
-//jobService.updateTimeBalance(2)
-
 
 app.listen(port, function() {
     console.log('Node server running @ http://localhost:'+ port + '...')
 })
-
-async function initConfig() {
-    let res = await Config.findOne({})
-    if (!res) {
-        Config({
-            statusBalanceChange: true,
-            apiKey: '111111'
-        }).save()
-    }
-}
 
 async function test() {
     const binance = new Binance().options({

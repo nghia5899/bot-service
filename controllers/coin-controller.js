@@ -3,10 +3,10 @@ const coinService = require('../services/coin-service')
 
 class CoinController {
 
-  async listAllCoin(req, res) {
+  async calculate(req, res) {
     try {
-      let response = await coinService.getBalance()
-      return res.json(new ResponseData(true, "", response.data).toJson())
+      let response = await coinService.calculate(req)
+      return res.json(new ResponseData(true, "", response).toJson())
     } catch (e) {
       console.log(e)
       return res.json(new ResponseData(false, e).toJson())

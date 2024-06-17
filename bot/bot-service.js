@@ -661,5 +661,3 @@ async function listChat(ctx) {
     ctx.telegram.sendMessage(chatId, 'Không có chat nào ')
   }
 }
-
-bot.launch()
