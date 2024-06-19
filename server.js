@@ -14,7 +14,7 @@ const config = require('./config/config')
 const {Config } = require('./models/config')
 const Binance = require('node-binance-api');
 
-const port = 3005;
+const port = 3006;
 
 require('./config/init-mongodb')
 
