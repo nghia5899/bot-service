@@ -9,7 +9,6 @@ const {message } = require('telegraf/filters')
 const { Wallet } = require('../models/wallet')
 const { Chat } = require('../models/chat')
 const botLoggerService = require('./bot-logger-service');
-const redisClient = require('../config/redis.js');
 
 bot.start( async (ctx) => {
   backToMenu(ctx)
