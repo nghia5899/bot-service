@@ -10,6 +10,8 @@ const { Wallet } = require('../models/wallet')
 const { Chat } = require('../models/chat')
 const botLoggerService = require('./bot-logger-service');
 
+bot.launch()
+
 bot.start( async (ctx) => {
   backToMenu(ctx)
 })
@@ -838,12 +840,9 @@ async function listWalletTrx(ctx) {
 async function reportWalletTrx(ctx) {
   try {
     let totalAllWallet = 0
-    const listWallet = await Wallet.find()
-    for (let j = 0; j < listWallet.length; j++) {
-      walletService.getBalanceUSDT_TRC20({message: {chat: {id: ctx.chat.id}}, telegram: ctx.telegram})
-    }
+    walletService.getBalanceUSDT_TRC20({message: {chat: {id: ctx.chat.id}}, telegram: ctx.telegram})
   } catch (e) {
     console.log(e)
   }
 }
-bot.launch()
+

@@ -347,6 +347,129 @@ const coinService = {
           }
         })
       },
+      getBalanceClient: async function(ctx) {
+        return new Promise(async (resolve, reject) => {
+          try {
+            let totalBalance = {}
+            const time = await binance.useServerTime();
+            let balances
+            let balancesFunding
+            let balancesEarn
+            try {
+              balances = await binance.balance()
+            } catch (e) {}
+            try {
+              balancesFunding = await binanceService.getBalanceFunding(time.serverTime, wallet)
+            } catch (e) {}
+            try {
+              balancesEarn = await binanceService.getBalanceEarn(time.serverTime, wallet)
+            } catch (e) {}
+            console.log('------ getBalance ------')
+            console.log('-----> Success')
+            let messages = `Name: ${wallet.name} \n` + 'Balances: \n'
+            const listCoin = config.LIST_COIN
+            for (let i = 0; i < listCoin.length; i += 1) {
+              const coin = listCoin[i]
+              let total = 0
+              messages += 'Coin: ' + coin + '\n'
+              if (balances) {
+                const coinData = await Coin.findOne({code: coin, idWallet: wallet.id, typeWallet: 'spot'})
+                messages += '-Spot: ' + Math.floor(balances[coin].available) + '\n'
+                total += Math.floor(parseFloat(balances[coin].available))
+                if (coinData) {
+                  let update = {
+                    amount: balances[coin].available
+                  }
+                  Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'spot'}, update, function(err) {
+                    if (err) console.log(err)
+                  })
+                } else {
+                  Coin({
+                    idWallet: wallet.id,
+                    typeWallet: 'spot',
+                    code: coin,
+                    amount: balances[coin].available,
+                  }).save()
+                }
+              } else {
+                messages += '-Spot: 0' + '\n'
+              }
+              
+              if (balancesFunding) {
+                try {
+                  const coinDataFunding = await Coin.findOne({code: coin, idWallet: wallet.id, typeWallet: 'funding'})
+                  console.log(coinDataFunding)
+                  const asset = balancesFunding.find(x => x.asset === coin)
+                  if (!asset) {
+                    messages += '-Funding: 0' + '\n'
+                    if (!coinDataFunding) {
+                      Coin({
+                        idWallet: wallet.id,
+                        typeWallet: 'funding',
+                        code: coin,
+                        amount: 0,
+                      }).save()
+                    }
+                  } else {
+                    messages += '-Funding: ' + Math.floor(parseFloat(asset.free)) + '\n'
+                    total += Math.floor(parseFloat(asset.free))
+                    if (coinDataFunding) {
+                      let update = {
+                        amount: asset.free
+                      }
+                      Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'funding'}, update, function(err) {
+                        if (err) console.log(err)
+                      })
+                    } else {
+                      Coin({
+                        idWallet: wallet.id,
+                        typeWallet: 'funding',
+                        code: coin,
+                        amount: asset.available,
+                      }).save()
+                    }
+                  }
+                } catch(e) {
+                  console.log(e)
+                }
+              } else {
+                messages += '-Funding: 0' + '\n'
+              }
+
+              if (balancesEarn) {
+                const coinDataEarn = await Coin.findOne({code: coin, idWallet: wallet.id, typeWallet: 'earn'})
+                messages += '-Earn: ' + Math.floor(parseFloat(balancesEarn.totalAmountInUSDT)) + '\n'
+                total += Math.floor(parseFloat(balancesEarn.totalAmountInUSDT))
+                if (coinDataEarn) {
+                  let update = {
+                    amount: balancesEarn.totalAmountInUSDT
+                  }
+                  Coin.findOneAndUpdate({code: coin, idWallet: wallet.id, typeWallet: 'earn'}, update, function(err) {
+                    if (err) console.log(err)
+                  })
+                } else {
+                  Coin({
+                    idWallet: wallet.id,
+                    typeWallet: 'earn',
+                    code: coin,
+                    amount: balancesEarn.totalAmountInUSDT,
+                  }).save()
+                }
+              } else {
+                messages += '-Earn: 0' + '\n'
+              }
+
+              messages += '-Total: ' + total + '\n'
+              totalBalance[coin] = total
+            }
+            return resolve(totalBalance)
+          } catch (e) {
+            console.log(e)
+            console.log('-----> Fail')
+            return resolve([])
+          }
+        })
+      },
       checkBalance: async function() {
         return new Promise(async (resolve, reject) => {
           try {
@@ -360,7 +483,9 @@ const coinService = {
             let balancesEarn
             try {
               balances = await binance.balance()
-            } catch (e) {}
+            } catch (e) {
+              console.log(e)
+            }
             try {
               balancesFunding = await binanceService.getBalanceFunding(time.serverTime, wallet)
             } catch (e) {}
@@ -394,8 +519,8 @@ const coinService = {
                   }
                   messages += 'Coin: ' + coin +'\n'
                   messages += '-Type: Spot' +'\n'
-                  messages += '-OldAmount: ' + oldBalanceSpot +'\n'
-                  messages += '-NewAmount: ' + parseFloat(balances[coin].available) +'\n'
+                  messages += '+OldAmount: ' + oldBalanceSpot +'\n'
+                  messages += '+NewAmount: ' + parseFloat(balances[coin].available) +'\n'
                   totalOld += oldBalanceSpot
                   total += parseFloat(balances[coin].available)
                   if (check) {
@@ -419,8 +544,8 @@ const coinService = {
                 }
                 messages += 'Coin: ' + coin +'\n'
                 messages += '-Type: Spot' +'\n'
-                messages += '-OldAmount: ' + oldBalanceSpot +'\n'
-                messages += '-NewAmount: ' + oldBalanceSpot +'\n'
+                messages += '+OldAmount: ' + oldBalanceSpot +'\n'
+                messages += '+NewAmount: ' + oldBalanceSpot +'\n'
               }
   
               let oldBalanceFunding = 0
@@ -487,7 +612,7 @@ const coinService = {
                       }
                     }
                   }
-                  messages += '+Type: Earn' +'\n'
+                  messages += '-Type: Earn' +'\n'
                   messages += '+OldAmount: ' + Math.floor(parseFloat(oldBalanceEarn)) +'\n'
                   messages += '+NewAmount: ' + Math.floor(parseFloat(balancesEarn.totalAmountInUSDT)) +'\n'
                   totalOld += oldBalanceEarn
@@ -513,8 +638,8 @@ const coinService = {
                 }
                 messages += 'Coin: ' + coin +'\n'
                 messages += '-Type: Earn' +'\n'
-                messages += '-OldAmount: ' + Math.floor(parseFloat(oldBalanceEarn)) +'\n'
-                messages += '-NewAmount: ' + Math.floor(parseFloat(oldBalanceEarn)) +'\n'
+                messages += '+OldAmount: ' + Math.floor(parseFloat(oldBalanceEarn)) +'\n'
+                messages += '+NewAmount: ' + Math.floor(parseFloat(oldBalanceEarn)) +'\n'
               }
   
               messages += 'Total: ' + Math.floor(total) + '\n'

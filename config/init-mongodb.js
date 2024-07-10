@@ -5,7 +5,7 @@ const database =  process.env.MONGODB_DATABASE || 'bot-service'
 
 console.log(server)
 mongoose
-  .connect(server + '/' + database, {
+  .connect('mongodb://127.0.0.1:27017/bot-service', {
     useNewUrlParser: true,  
     useUnifiedTopology: true,  
     useFindAndModify: false,

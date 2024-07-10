@@ -1,5 +1,6 @@
 const { TrxWallet } = require('../models/trx_wallet')
 const botTrxWallet = require('../bot/bot-logger-service-wallet');
+const botTrxWalletClient = require('../bot/bot-logger-service-wallet-client');
 const axios = require('axios')
 
 const walletService = {
@@ -79,17 +80,27 @@ const walletService = {
           messages += 'Balance: ' + Math.floor(parseFloat(listTrxWallet[i].balance)) +'\n'
       if (ctx) {
         const chatId = ctx.message.chat.id
-        ctx.telegram.sendMessage(chatId, messages)
+        await ctx.telegram.sendMessage(chatId, messages)
       } else {
-        botTrxWallet.sendMessage(messages)
+        await botTrxWallet.sendMessage(messages)
       }
+
       total += Math.floor(parseFloat(listTrxWallet[i].balance))
     }
     if (ctx) {
-      ctx.telegram.sendMessage(chatId,`Total All Wallet: ${total}`)
+      ctx.telegram.sendMessage(ctx.message.chat.id,`Tru Wallet: ${total}`)
     } else {
-      botTrxWallet.sendMessage(`Total All Wallet: ${total}`)
+      botTrxWallet.sendMessage(`Tru Wallet: ${total}`)
     }
+  },
+  async getBalanceUSDT_TRC20_client(ctx) {
+    console.log('------getBalanceUSDT_TRC20-------')
+    const listTrxWallet = await TrxWallet.find()
+    let total = 0
+    for (let i = 0; i < listTrxWallet.length; i++) {
+      total += Math.floor(parseFloat(listTrxWallet[i].balance))
+    }
+    botTrxWalletClient.sendMessage(`Tru Wallet: ${total}`)
   },
   async checkBalanceUSDT_TRC20() {
     console.log('------checkBalanceUSDT_TRC20-------')
@@ -110,7 +121,7 @@ const walletService = {
       totalOld += parseFloat(listTrxWallet[i].balance)
       console.log('balance old')
       console.log(parseFloat(listTrxWallet[i].balance))
-      if (parseFloat(balance) != parseFloat(listTrxWallet[i].balance)) {
+      if (parseFloat(balance) - parseFloat(listTrxWallet[i].balance) > 5 || parseFloat(balance) - parseFloat(listTrxWallet[i].balance) < -5) {
         check = true
         let messages = `Wallet: ${listTrxWallet[i].name} \n`
         messages += `Address: ${listTrxWallet[i].address} \n`
@@ -133,7 +144,8 @@ const walletService = {
       }
     } 
     if (check) {
-      botTrxWallet.sendMessage(`Total All Wallet Old: ${Math.floor(totalOld)} \nTotal All Wallet New: ${Math.floor(totalNew)}`, true)
+      botTrxWallet.sendMessage(`Tru Wallet Old: ${Math.floor(totalOld)} \nTru Wallet New: ${Math.floor(totalNew)}`, true)
+      botTrxWalletClient.sendMessage(`Tru Wallet: ${Math.floor(totalNew)}`, true)
     }
   },
 }

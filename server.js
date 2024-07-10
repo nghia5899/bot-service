@@ -5,11 +5,11 @@ const route = require('./routes/index-routes')
 const path = require('path')
 const app = express();
 const cors = require('cors')
+const bot = require('./bot/bot-service')
 const coinService = require('./services/coin-service')
 const walletService = require('./services/wallet-service')
 const binanceService = require('./services/binance-service')
 const jobService = require('./services/job-service')
-const bot = require('./bot/bot-service')
 const config = require('./config/config')
 const {Config } = require('./models/config')
 const Binance = require('node-binance-api');
@@ -30,7 +30,7 @@ app.use(cors())
 
 route(app);
 
-initConfig()
+//initConfig()
 
 jobService.startJobGetBalances()
 
