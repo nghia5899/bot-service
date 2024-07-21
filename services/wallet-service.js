@@ -78,12 +78,12 @@ const walletService = {
       let messages = `Wallet: ${listTrxWallet[i].name} \n`
           messages += `Address: ${listTrxWallet[i].address} \n`
           messages += 'Balance: ' + Math.floor(parseFloat(listTrxWallet[i].balance)) +'\n'
-      if (ctx) {
-        const chatId = ctx.message.chat.id
-        await ctx.telegram.sendMessage(chatId, messages)
-      } else {
-        await botTrxWallet.sendMessage(messages)
-      }
+      // if (ctx) {
+      //   const chatId = ctx.message.chat.id
+      //   await ctx.telegram.sendMessage(chatId, messages)
+      // } else {
+      //   await botTrxWallet.sendMessage(messages)
+      // }
 
       total += Math.floor(parseFloat(listTrxWallet[i].balance))
     }
@@ -121,6 +121,7 @@ const walletService = {
       totalOld += parseFloat(listTrxWallet[i].balance)
       console.log('balance old')
       console.log(parseFloat(listTrxWallet[i].balance))
+      if (balance < 0) return
       if (parseFloat(balance) - parseFloat(listTrxWallet[i].balance) > 5 || parseFloat(balance) - parseFloat(listTrxWallet[i].balance) < -5) {
         check = true
         let messages = `Wallet: ${listTrxWallet[i].name} \n`
@@ -138,14 +139,15 @@ const walletService = {
           if (err) console.log(err)
         })
         console.log(messages)
-        botTrxWallet.sendMessage(messages)
+        await botTrxWallet.sendMessage(messages)
       } else {
         totalNew += parseFloat(listTrxWallet[i].balance)
       }
     } 
+    
     if (check) {
       botTrxWallet.sendMessage(`Tru Wallet Old: ${Math.floor(totalOld)} \nTru Wallet New: ${Math.floor(totalNew)}`, true)
-      botTrxWalletClient.sendMessage(`Tru Wallet: ${Math.floor(totalNew)}`, true)
+      //botTrxWalletClient.sendMessage(`Tru Wallet: ${Math.floor(totalNew)}`, true)
     }
   },
 }
@@ -163,7 +165,7 @@ async function getBalanceUSDT(address) {
       return resolve(0)
     } catch (e) {
       console.log(e)
-      return resolve(0)
+      return resolve(-1)
     }
   })
 }

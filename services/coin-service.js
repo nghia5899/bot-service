@@ -335,10 +335,11 @@ const coinService = {
               console.log(ctx)
               const chatId = ctx.message.chat.id
               ctx.telegram.sendMessage(chatId, messages)
-            } else {
-              console.log('send')
-              botLoggerService.sendMessage(messages, wallet.status)
             }
+            // } else {
+            //   console.log('send')
+            //   botLoggerService.sendMessage(messages, wallet.status)
+            // }
             return resolve(totalBalance)
           } catch (e) {
             console.log(e)

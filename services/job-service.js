@@ -9,7 +9,7 @@ const botWalleTrx = require('../bot/bot-logger-service-wallet');
 const botWalleTrxClient = require('../bot/bot-logger-service-wallet-client');
 
 let jobGetBalance = new cronJob.CronJob({
-  cronTime: ' 0 */2 * * *', 
+  cronTime: ' 0 */1 * * *', 
   onTick: async function() {
     console.log(`Time - ${getTime().toLocaleLowerCase()}`)
     handleGetBalance()
@@ -89,8 +89,8 @@ async function logicJob() {
       }
     }
     if (checkSend) {
-      botLoggerService.sendMessage(`Total All Wallet Old: ${Math.floor(totalAllWalletOld)} \nTotal All Wallet New: ${Math.floor(totalAllWalletNew)}`, true)
-      botLoggerServiceGuest.sendMessage(`Total All Wallet Old: ${Math.floor(totalAllWalletOld)} \nTotal All Wallet New: ${Math.floor(totalAllWalletNew)}`, true)
+      botLoggerService.sendMessage(`Bina Wallet Old: ${Math.floor(totalAllWalletOld)} \n Bina Wallet New: ${Math.floor(totalAllWalletNew)}`, true)
+      //botLoggerServiceGuest.sendMessage(`Total All Wallet Old: ${Math.floor(totalAllWalletOld)} \nTotal All Wallet New: ${Math.floor(totalAllWalletNew)}`, true)
     }
   } catch(e) {
     console.log(e)
