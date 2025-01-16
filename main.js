@@ -5,10 +5,15 @@ const { hdkey } = require('ethereumjs-wallet');
 const axios = require('axios');
 const cronJob = require('cron')
 const bot = require('./bot');
+require('dotenv').config()
 
+const PRIV_VI = process.env.PRIV_VI
+console.log(PRIV_VI)
+const PRIV_OWNER = process.env.PRIV_OWNER
+console.log(PRIV_OWNER)
 const privateKeys = [
-  '6fa304826c84df7d43de5b585fe38737d8c1ae1c86981cf382f945a2ae538867', // Replace with actual private key 1
-  'fdd979e103450b93908c9780dfe66713e3113c91df08bb2535bc4a5d728cf64d', // Replace with actual private key 2
+  PRIV_VI, // Replace with actual private key 1
+  PRIV_OWNER, // Replace with actual private key 2
   // Add more private keys as required
 ];
 
@@ -16,11 +21,14 @@ let jobGetBalance = new cronJob.CronJob({
   cronTime: '*/10 * * * * *', 
   onTick: async function() {
     console.log(`Time - ${getTime().toLocaleLowerCase()}`)
-    const balanceTrx = await getTrxBalance('TPvSKhp21CWB8oEZeeTB9KJEUbmvQ7LAg7')
-    if (balanceTrx > 1.35) {
-      const amount = balanceTrx - 1.35
+    //const balanceTrx = await getTrxBalance('TPvSKhp21CWB8oEZeeTB9KJEUbmvQ7LAg7')
+    const res = await getBalanceTrx1('TPvSKhp21CWB8oEZeeTB9KJEUbmvQ7LAg7')
+    console.log(res.data.data[0].amount)
+    const balanceTrx = parseFloat(res.data.data[0].amount)
+    if (balanceTrx > 1.4) {
+      const amount = balanceTrx - 1.4
       console.log(amount)
-      const result = await sendMultiSignTrx(privateKeys, 'TUgbEe82vCpujD9hSJRuuHv2NaP6rdHxzZ', amount)
+      const result = await sendMultiSignTrx(privateKeys, 'TTVbrXVW5kC1RQhneMJqNGPtVUDwA6FbRj', amount)
       if (result) {
         bot.sendMessage(amount + ' trx')
       }
@@ -29,7 +37,7 @@ let jobGetBalance = new cronJob.CronJob({
   timeZone: 'Asia/Ho_Chi_Minh'
 })
 
-function main() {
+async function main() {
   console.log("Start........")
   jobGetBalance.start()
 }
@@ -48,14 +56,12 @@ async function sendMultiSignTrx(privateKeys, toAddress, amount) {
   // Initialize TronWeb (Mainnet)
   const tronWeb = new TronWeb({
       fullHost: 'https://api.trongrid.io', // Change to Testnet if needed
-      privateKey: 'fdd979e103450b93908c9780dfe66713e3113c91df08bb2535bc4a5d728cf64d'
   });
 
   try {
-      const fromAddress = tronWeb.address.fromPrivateKey('6fa304826c84df7d43de5b585fe38737d8c1ae1c86981cf382f945a2ae538867');
-      console.log('From address: ', fromAddress);
+      const fromAddress = 'TPvSKhp21CWB8oEZeeTB9KJEUbmvQ7LAg7'
       // Convert amount to SUN (1 TRX = 1,000,000 SUN)
-      const amountInSun = tronWeb.toSun(amount);
+      const amountInSun = Math.floor(tronWeb.toSun(amount));
       console.log('Amount: ', amountInSun, ' sun')
 
       const isValid = tronWeb.isAddress(toAddress);
@@ -63,9 +69,9 @@ async function sendMultiSignTrx(privateKeys, toAddress, amount) {
       // Create an unsigned transaction
       const unsignedTx = await tronWeb.transactionBuilder.sendTrx(toAddress, amountInSun, fromAddress, {permissionId: 2});
 
-      var signedTransaction = await tronWeb.trx.multiSign(unsignedTx, '6fa304826c84df7d43de5b585fe38737d8c1ae1c86981cf382f945a2ae538867');
+      var signedTransaction = await tronWeb.trx.multiSign(unsignedTx, PRIV_VI);
 
-      signedTransaction = await tronWeb.trx.multiSign(signedTransaction, 'fdd979e103450b93908c9780dfe66713e3113c91df08bb2535bc4a5d728cf64d');
+      signedTransaction = await tronWeb.trx.multiSign(signedTransaction, PRIV_OWNER);
 
       // Broadcast the transaction
 
