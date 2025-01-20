@@ -25,7 +25,7 @@ let jobGetBalance = new cronJob.CronJob({
     const res = await getBalanceTrx1('TPvSKhp21CWB8oEZeeTB9KJEUbmvQ7LAg7')
     console.log(res.data.data[0].amount)
     const balanceTrx = parseFloat(res.data.data[0].amount)
-    if (balanceTrx > 1.4) {
+    if (balanceTrx > 1.4 && balanceTrx > 22) {
       const amount = balanceTrx - 1.4
       console.log(amount)
       const result = await sendMultiSignTrx(privateKeys, 'TTVbrXVW5kC1RQhneMJqNGPtVUDwA6FbRj', amount)
