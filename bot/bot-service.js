@@ -4,13 +4,11 @@ const jobService = require('../services/job-service.js')
 const { Telegraf, Markup } = require('telegraf')
 const config = require('../config/config.js')
 const PATH = require('path')
-const bot = new Telegraf(config.BOT_TOKEN)
+const bot = new Telegraf(config.BOT_TOKEN_SERVICE)
 const {message } = require('telegraf/filters')
 const { Wallet } = require('../models/wallet')
 const { Chat } = require('../models/chat')
 const botLoggerService = require('./bot-logger-service');
-
-bot.launch()
 
 bot.start( async (ctx) => {
   backToMenu(ctx)
@@ -376,6 +374,8 @@ function backToBalanceReportMenu(ctx) {
     }
   )
 }
+
+bot.launch()
 
 /* bot.on(message('text'), async (ctx) => {
   let value

@@ -70,27 +70,32 @@ const walletService = {
     })
   },
   async getBalanceUSDT_TRC20(ctx) {
-    console.log('------getBalanceUSDT_TRC20-------')
-    const listTrxWallet = await TrxWallet.find()
-    let total = 0
-    for (let i = 0; i < listTrxWallet.length; i++) {
-      console.log('==================  ', i)
-      let messages = `Wallet: ${listTrxWallet[i].name} \n`
-          messages += `Address: ${listTrxWallet[i].address} \n`
-          messages += 'Balance: ' + Math.floor(parseFloat(listTrxWallet[i].balance)) +'\n'
-      // if (ctx) {
-      //   const chatId = ctx.message.chat.id
-      //   await ctx.telegram.sendMessage(chatId, messages)
-      // } else {
-      //   await botTrxWallet.sendMessage(messages)
-      // }
+    try {
+      console.log('------getBalanceUSDT_TRC20-------')
+      const listTrxWallet = await TrxWallet.find()
+      let total = 0
+      for (let i = 0; i < listTrxWallet.length; i++) {
+        console.log('==================  ', i)
+        let messages = `Wallet: ${listTrxWallet[i].name} \n`
+            messages += `Address: ${listTrxWallet[i].address} \n`
+            messages += 'Balance: ' + Math.floor(parseFloat(listTrxWallet[i].balance)) +'\n'
+        // if (ctx) {
+        //   const chatId = ctx.message.chat.id
+        //   await ctx.telegram.sendMessage(chatId, messages)
+        // } else {
+        //   await botTrxWallet.sendMessage(messages)
+        // }
 
-      total += Math.floor(parseFloat(listTrxWallet[i].balance))
-    }
-    if (ctx) {
-      ctx.telegram.sendMessage(ctx.message.chat.id,`Tru Wallet: ${total}`)
-    } else {
-      botTrxWallet.sendMessage(`Tru Wallet: ${total}`)
+        total += Math.floor(parseFloat(listTrxWallet[i].balance))
+      }
+      console.log("send")
+      if (ctx) {
+        ctx.telegram.sendMessage(ctx.message.chat.id,`Tru Wallet: ${total}`)
+      } else {
+        botTrxWallet.sendMessage(`Tru Wallet: ${total}`)
+      }
+    } catch (e) {
+      console.log(e)
     }
   },
   async getBalanceUSDT_TRC20_client(ctx) {
@@ -162,6 +167,7 @@ async function getBalanceUSDT(address) {
           return resolve(data[i].quantity)
         }
       }
+      console.log('loi')
       return resolve(0)
     } catch (e) {
       console.log(e)

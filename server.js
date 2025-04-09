@@ -13,7 +13,7 @@ const jobService = require('./services/job-service')
 const config = require('./config/config')
 const {Config } = require('./models/config')
 const Binance = require('node-binance-api');
-
+console.log("11111111111")
 const port = 3006;
 
 require('./config/init-mongodb')

@@ -11,12 +11,13 @@ module.exports = {
       try {
         if (process.env.IGNORE_TELEGRAM_BOT) return resolve()
         //if (!enable) return resolve()
+        console.log(bot.botInfo)
         if (!bot.botInfo) {
           bot.botInfo = await bot.telegram.getMe()
         }
         const id = bot.botInfo.id
         const listChatId = await Chat.find({idBot: id})
-        console.log(listChatId)
+        console.log('list chat')
         for (let i = 0; i < listChatId.length; i += 1) {
           console.log(' --- Bot send ---')
           console.info(message)
